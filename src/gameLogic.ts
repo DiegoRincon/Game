@@ -1,4 +1,17 @@
-type Board = string[][];
+
+/**
+ * A Board can have 5 values
+ * -1 -- empty
+ * 0 -- black Stone
+ * 1 -- white Stone
+ */
+type Board = number[][];
+
+interface Stone {
+    row: number;
+    col: number;
+}
+
 interface BoardDelta {
   row: number;
   col: number;
@@ -6,11 +19,19 @@ interface BoardDelta {
 interface IState {
   board: Board;
   delta: BoardDelta;
+  hasPassed: Boolean;
+  whiteStones: Stone[];
+  blackStones: Stone[];
+  whiteScore: number;
+  blackScore: number;
 }
 
 module gameLogic {
-  export const ROWS = 3;
-  export const COLS = 3;
+  //TODO: Allow players to determine cells.
+  export const ROWS = 5;
+  export const COLS = 5;
+  export const BLACK = 0;
+  export const WHITE = 1;
 
   /** Returns the initial TicTacToe board, which is a ROWSxCOLS matrix containing ''. */
   function getInitialBoard(): Board {
@@ -18,14 +39,17 @@ module gameLogic {
     for (let i = 0; i < ROWS; i++) {
       board[i] = [];
       for (let j = 0; j < COLS; j++) {
-        board[i][j] = '';
+        board[i][j] = -1;
       }
     }
     return board;
   }
 
+  //TODO: Add a parameter for handicap
   export function getInitialState(): IState {
-    return {board: getInitialBoard(), delta: null};
+      let whiteStones: Stone[] = [];
+      let blackStones: Stone[] = [];
+      return { board: getInitialBoard(), delta: null, hasPassed: false, whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones };
   }
 
   /**
@@ -38,7 +62,7 @@ module gameLogic {
   function isTie(board: Board): boolean {
     for (let i = 0; i < ROWS; i++) {
       for (let j = 0; j < COLS; j++) {
-        if (board[i][j] === '') {
+        if (board[i][j] === -1) {
           // If there is an empty cell then we do not have a tie.
           return false;
         }
@@ -49,43 +73,49 @@ module gameLogic {
   }
 
   /**
-   * Return the winner (either 'X' or 'O') or '' if there is no winner.
-   * The board is a matrix of size 3x3 containing either 'X', 'O', or ''.
-   * E.g., getWinner returns 'X' for the following board:
-   *     [['X', 'O', ''],
-   *      ['X', 'O', ''],
-   *      ['X', '', '']]
+   * TODO: IMPLEMENT THIS
    */
   function getWinner(board: Board): string {
-    let boardString = '';
-    for (let i = 0; i < ROWS; i++) {
-      for (let j = 0; j < COLS; j++) {
-        let cell = board[i][j];
-        boardString += cell === '' ? ' ' : cell;
-      }
-    }
-    let win_patterns = [
-      'XXX......',
-      '...XXX...',
-      '......XXX',
-      'X..X..X..',
-      '.X..X..X.',
-      '..X..X..X',
-      'X...X...X',
-      '..X.X.X..'
-    ];
-    for (let win_pattern of win_patterns) {
-      let x_regexp = new RegExp(win_pattern);
-      let o_regexp = new RegExp(win_pattern.replace(/X/g, 'O'));
-      if (x_regexp.test(boardString)) {
-        return 'X';
-      }
-      if (o_regexp.test(boardString)) {
-        return 'O';
-      }
-    }
+          
     return '';
   }
+  
+  function isSuicide(board: Board, row: number, col: number, oppColor: number): boolean {
+      for (let i=-1; i<2; i++) {
+          for (let j=-1; j<2; j++) {
+              if (i === 0 && j === 0) {
+                  continue;
+              }
+              if (row+i < 0 || col+j <0) {
+                  continue;
+              }
+              //oppColor will be the opponent's color
+              if (board[row+i][col+j] !== oppColor) {
+                  return false
+              }
+          }
+      }      
+      return true;
+  }
+  
+  /**
+   * Returns whether the move doesn't break the rules
+   */
+  function isLegalMove(
+      stateBeforeMove: IState, row: number, col: number, turnIndexBeforeMove: number): boolean {
+      let board: Board = stateBeforeMove.board;
+      //Check if intersection is empty
+      if (board[row][col] !== -1) {
+          throw new Error("One can only make a move in an empty position!");
+      }
+      //Make sure you are not suiciding
+      let color = (turnIndexBeforeMove === 1) ? 0 : 1;
+      if (isSuicide(board, row, col, color)) {
+          throw new Error("You cannot make a suicide move");
+      }
+      return true;
+  }
+  
 
   /**
    * Returns the move that should be performed when player
@@ -96,46 +126,222 @@ module gameLogic {
     if (!stateBeforeMove) { // stateBeforeMove is null in a new match.
       stateBeforeMove = getInitialState();
     }
-    let board: Board = stateBeforeMove.board;
-    if (board[row][col] !== '') {
-      throw new Error("One can only make a move in an empty position!");
-    }
-    if (getWinner(board) !== '' || isTie(board)) {
-      throw new Error("Can only make a move if the game is not over!");
-    }
-    let boardAfterMove = angular.copy(board);
-    boardAfterMove[row][col] = turnIndexBeforeMove === 0 ? 'X' : 'O';
-    let winner = getWinner(boardAfterMove);
+    let board: Board = stateBeforeMove.board;    
     let endMatchScores: number[];
     let turnIndexAfterMove: number;
-    if (winner !== '' || isTie(boardAfterMove)) {
-      // Game over.
-      turnIndexAfterMove = -1;
-      endMatchScores = winner === 'X' ? [1, 0] : winner === 'O' ? [0, 1] : [0, 0];
-    } else {
-      // Game continues. Now it's the opponent's turn (the turn switches from 0 to 1 and 1 to 0).
-      turnIndexAfterMove = 1 - turnIndexBeforeMove;
-      endMatchScores = null;
+    /**
+     * MAKE SURE THE PLAY ADHERES TO RULES
+     */
+    
+    let gameEnded : Boolean;
+    if (row === -1 && col === -1) {
+        gameEnded = (stateBeforeMove.hasPassed) ? true : false;
+        let delta: BoardDelta = {row: row, col: col};
+        return endOfTurnMove(board, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta);
     }
+    
+    if (!isLegalMove(stateBeforeMove,row,col,turnIndexBeforeMove)) {
+        throw Error("Not a legal move!")
+    }
+    
+    // At this point everything looks good, compute scores and move on
+    
+    let boardAfterMove = angular.copy(board);
+    boardAfterMove[row][col] = turnIndexBeforeMove;
     let delta: BoardDelta = {row: row, col: col};
-    let stateAfterMove: IState = {delta: delta, board: boardAfterMove};
-    return {endMatchScores: endMatchScores, turnIndexAfterMove: turnIndexAfterMove, stateAfterMove: stateAfterMove};
+    return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta);
+  }
+  
+  function removeTrappedStonesBoard(trappedStones: Stone[], board: Board): void {
+      if (!trappedStones) {
+          return;
+      }
+      for (let i = 0; i < trappedStones.length; i++) {
+          let stone = trappedStones[i];
+          board[stone.row][stone.col] = -1;
+      }
+  }
+  
+  function removeTrappedStones(trappedStones: Stone[], stones: Stone[]): void {
+      if (!trappedStones) {
+          return;
+      }
+      for (let i = 0; i < trappedStones.length; i++) {
+          for (let j = 0; j < stones.length; j++) {
+              let stone = trappedStones[i];
+              if (angular.equals(stone, stones[j])) {
+                  stones.splice(j,1);
+              }
+          }
+      }
+  }
+  
+  function endOfTurnMove(boardAfterMove: Board, gameEnded: Boolean, turnIndexBeforeMove: number, stateBeforeMove: IState, delta: BoardDelta): IMove {
+      let newWhiteScore: number = 0;
+      let newBlackScore: number = 0;
+      let hasPassed: boolean = false;
+      if (delta.row === -1 && delta.col === -1) {
+          hasPassed = true;
+      }
+      if (!hasPassed && turnIndexBeforeMove === WHITE) {
+          let trappedStones = getTrapped(boardAfterMove, BLACK, stateBeforeMove.blackStones);
+          removeTrappedStonesBoard(trappedStones, boardAfterMove);
+          removeTrappedStones(trappedStones, stateBeforeMove.blackStones);
+          
+          let newStones: number = (trappedStones) ? trappedStones.length: 0;
+          newWhiteScore = stateBeforeMove.whiteScore + newStones;
+      } else if (!hasPassed) {          
+          let trappedStones = getTrapped(boardAfterMove, WHITE, stateBeforeMove.whiteStones);
+          removeTrappedStonesBoard(trappedStones, boardAfterMove);
+          removeTrappedStones(trappedStones, stateBeforeMove.whiteStones);
+          
+          let newStones: number = (trappedStones) ? trappedStones.length: 0;
+          newBlackScore = stateBeforeMove.whiteScore + newStones;
+      }
+      if (hasPassed) {
+          newWhiteScore = stateBeforeMove.whiteScore;
+          newBlackScore = stateBeforeMove.blackScore;
+      }
+      let endMatchScores : number[];
+      if (gameEnded) {
+          endMatchScores = [newBlackScore, newWhiteScore];
+      } else {
+          endMatchScores = null;
+      }
+      let newWhiteStones: Stone[] = [];
+      let newBlackStones: Stone[] = [];
+      if (!hasPassed) {
+          newWhiteStones = (turnIndexBeforeMove === WHITE) ? stateBeforeMove.whiteStones.concat({ row: delta.row, col: delta.col }) : stateBeforeMove.whiteStones;
+          newBlackStones = (turnIndexBeforeMove === BLACK) ? stateBeforeMove.blackStones.concat({ row: delta.row, col: delta.col }) : stateBeforeMove.blackStones;
+      } else {
+          newWhiteStones = stateBeforeMove.whiteStones;
+          newBlackStones = stateBeforeMove.blackStones;
+      }
+      let stateAfterMove: IState = {
+          delta: delta,
+          board: boardAfterMove,
+          hasPassed: hasPassed,
+          whiteScore: newWhiteScore,
+          blackScore: newBlackScore,
+          whiteStones: newWhiteStones,
+          blackStones: newBlackStones };
+      return {endMatchScores: endMatchScores, turnIndexAfterMove: (turnIndexBeforeMove == WHITE) ? BLACK : WHITE, stateAfterMove: stateAfterMove};
+  }
+
+  function getTrapped(board: Board, color: number, colorStones: Stone[]): Stone[] {
+      let trapped: Stone[] = [];
+      let seen: Stone[] = [];
+      let connected = getConnected(seen, board, colorStones, color);
+      while (connected && connected.length !== 0) {
+          //check if connected stones have an exit
+          if (stonesHaveExit(connected, board)) {
+              seen = seen.concat(connected);
+              connected = getConnected(seen, board, colorStones, color);
+              continue;
+          } else {
+              //these stones are trapped!!
+              //Add stones to trapped
+              trapped = trapped.concat(connected);
+              //add stones to seen
+              seen = seen.concat(connected);
+              connected = getConnected(seen, board, colorStones, color);
+          }
+      }
+      return trapped;
+      
+  } 
+ 
+  
+  /**
+   * Returns a connected sequence of white stones that are not contained in Seen. Null if none.
+   */
+  function getConnected(seen: Stone[], board: Board, stones: Stone[], color: number): Stone[] {
+      for (let i = 0; i < stones.length; i++) {
+          let stone: Stone = stones[i];
+          if (isStoneInArray(stone, seen)) {
+              continue;
+          }
+          let stoneArray: Stone[] = [];
+          return getAllConnectedFromStone(stone, board, color, stoneArray);
+      }
+      return null;
+  }
+  
+  function getAllConnectedFromStone(stone: Stone, board: Board, color: number, visited: Stone[]): Stone[] {
+      visited.push(stone);
+      let x = stone.row;
+      let y = stone.col;
+      for (let i = -1; i < 2; i++) {
+          for (let j = -1; j < 2; j++) {
+              if (Math.abs(i) === Math.abs(j)) {
+                  continue;
+              }
+              if (x + i < 0 || x + j < 0) {
+                  continue;
+              }
+              if (board[x + i][y + j] === color) {
+                  let nextStone = { row: x + i, col: y + j };
+                  if (isStoneInArray(nextStone, visited)) {
+                      continue;
+                  }
+                  let connected: Stone[] = getAllConnectedFromStone(nextStone, board, color, visited);
+                  //visited = visited.concat(connected);
+              }
+          }
+      }
+      return visited;
+  }
+  
+  function stonesHaveExit(stones: Stone[], board: Board): boolean {
+      for (let i = 0; i < stones.length; i++) {
+          let stone = stones[i];
+          let x = stone.row;
+          let y = stone.col;
+          for (let i = -1; i < 2; i++) {
+              for (let j = -1; j < 2; j++) {
+                  if (Math.abs(i) === Math.abs(j)) {
+                      continue;
+                  }
+                  if (x + i < 0 || x + j < 0) {
+                      continue;
+                  }
+                  if (board[x + i][y + j] === -1) {
+                      return true;
+                  }
+              }
+          }
+      }
+      return false;
+  }
+  
+  function isStoneInArray(stone: Stone, arr: Stone[]): boolean {
+      if (!arr) {
+          return false;
+      }
+      for (let i = 0; i < arr.length; i++) {
+          let s: Stone = arr[i];
+          if (angular.equals(s, stone)) {
+              return true;
+          }
+      }
+      return false;
   }
 
   export function checkMoveOk(stateTransition: IStateTransition): void {
-    // We can assume that turnIndexBeforeMove and stateBeforeMove are legal, and we need
-    // to verify that the move is OK.
-    let turnIndexBeforeMove = stateTransition.turnIndexBeforeMove;
-    let stateBeforeMove: IState = stateTransition.stateBeforeMove;
-    let move: IMove = stateTransition.move;
-    let deltaValue: BoardDelta = stateTransition.move.stateAfterMove.delta;
-    let row = deltaValue.row;
-    let col = deltaValue.col;
-    let expectedMove = createMove(stateBeforeMove, row, col, turnIndexBeforeMove);
-    if (!angular.equals(move, expectedMove)) {
-      throw new Error("Expected move=" + angular.toJson(expectedMove, true) +
-          ", but got stateTransition=" + angular.toJson(stateTransition, true))
-    }
+      // We can assume that turnIndexBeforeMove and stateBeforeMove are legal, and we need
+      // to verify that the move is OK.
+    
+      let turnIndexBeforeMove = stateTransition.turnIndexBeforeMove;
+      let stateBeforeMove: IState = stateTransition.stateBeforeMove;
+      let move: IMove = stateTransition.move;
+      let deltaValue: BoardDelta = stateTransition.move.stateAfterMove.delta;
+      let row = deltaValue.row;
+      let col = deltaValue.col;
+      let expectedMove = createMove(stateBeforeMove, row, col, turnIndexBeforeMove);
+      if (!angular.equals(move, expectedMove)) {
+          throw new Error("Expected move=" + angular.toJson(move, true) +
+              ", but got move=" + angular.toJson(expectedMove, true))
+      }
   }
 
   export function forSimpleTestHtml() {
