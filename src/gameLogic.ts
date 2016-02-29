@@ -1,10 +1,3 @@
-
-/**
- * A Board can have 5 values
- * -1 -- empty
- * 0 -- black Stone
- * 1 -- white Stone
- */
 type Board = number[][];
 
 interface Stone {
@@ -28,8 +21,8 @@ interface IState {
 
 module gameLogic {
   //TODO: Allow players to determine cells.
-  export const ROWS = 5;
-  export const COLS = 5;
+  export let ROWS : number = 13;
+  export let COLS : number = 13;
   export const BLACK = 0;
   export const WHITE = 1;
 
@@ -52,13 +45,6 @@ module gameLogic {
       return { board: getInitialBoard(), delta: null, hasPassed: false, whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones };
   }
 
-  /**
-   * Returns true if the game ended in a tie because there are no empty cells.
-   * E.g., isTie returns true for the following board:
-   *     [['X', 'O', 'X'],
-   *      ['X', 'O', 'O'],
-   *      ['O', 'X', 'X']]
-   */
   function isTie(board: Board): boolean {
     for (let i = 0; i < ROWS; i++) {
       for (let j = 0; j < COLS; j++) {
@@ -71,26 +57,21 @@ module gameLogic {
     // No empty cells, so we have a tie!
     return true;
   }
-
-  /**
-   * TODO: IMPLEMENT THIS
-   */
-  function getWinner(board: Board): string {
-          
-    return '';
-  }
   
   function isSuicide(board: Board, row: number, col: number, oppColor: number): boolean {
-      for (let i=-1; i<2; i++) {
-          for (let j=-1; j<2; j++) {
-              if (i === 0 && j === 0) {
+      for (let i = -1; i < 2; i++) {
+          for (let j = -1; j < 2; j++) {
+              if (Math.abs(i) === Math.abs(j)) {
                   continue;
               }
-              if (row+i < 0 || col+j <0) {
+              if (row + i < 0 || col + j < 0) {
+                  continue;
+              }
+              if (row + i >= ROWS || col + j >= COLS) {
                   continue;
               }
               //oppColor will be the opponent's color
-              if (board[row+i][col+j] !== oppColor) {
+              if (board[row + i][col + j] !== oppColor) {
                   return false
               }
           }
@@ -183,17 +164,19 @@ module gameLogic {
       if (delta.row === -1 && delta.col === -1) {
           hasPassed = true;
       }
+      let newWhiteStones: Stone[] = angular.copy(stateBeforeMove.whiteStones);
+      let newBlackStones: Stone[] = angular.copy(stateBeforeMove.blackStones);
       if (!hasPassed && turnIndexBeforeMove === WHITE) {
           let trappedStones = getTrapped(boardAfterMove, BLACK, stateBeforeMove.blackStones);
           removeTrappedStonesBoard(trappedStones, boardAfterMove);
-          removeTrappedStones(trappedStones, stateBeforeMove.blackStones);
+          removeTrappedStones(trappedStones, newBlackStones);
           
           let newStones: number = (trappedStones) ? trappedStones.length: 0;
           newWhiteScore = stateBeforeMove.whiteScore + newStones;
       } else if (!hasPassed) {          
           let trappedStones = getTrapped(boardAfterMove, WHITE, stateBeforeMove.whiteStones);
           removeTrappedStonesBoard(trappedStones, boardAfterMove);
-          removeTrappedStones(trappedStones, stateBeforeMove.whiteStones);
+          removeTrappedStones(trappedStones, newWhiteStones);
           
           let newStones: number = (trappedStones) ? trappedStones.length: 0;
           newBlackScore = stateBeforeMove.whiteScore + newStones;
@@ -208,14 +191,9 @@ module gameLogic {
       } else {
           endMatchScores = null;
       }
-      let newWhiteStones: Stone[] = [];
-      let newBlackStones: Stone[] = [];
       if (!hasPassed) {
-          newWhiteStones = (turnIndexBeforeMove === WHITE) ? stateBeforeMove.whiteStones.concat({ row: delta.row, col: delta.col }) : stateBeforeMove.whiteStones;
-          newBlackStones = (turnIndexBeforeMove === BLACK) ? stateBeforeMove.blackStones.concat({ row: delta.row, col: delta.col }) : stateBeforeMove.blackStones;
-      } else {
-          newWhiteStones = stateBeforeMove.whiteStones;
-          newBlackStones = stateBeforeMove.blackStones;
+          newWhiteStones = (turnIndexBeforeMove === WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
+          newBlackStones = (turnIndexBeforeMove === BLACK) ? newBlackStones.concat({ row: delta.row, col: delta.col }) : newBlackStones;
       }
       let stateAfterMove: IState = {
           delta: delta,
@@ -276,7 +254,10 @@ module gameLogic {
               if (Math.abs(i) === Math.abs(j)) {
                   continue;
               }
-              if (x + i < 0 || x + j < 0) {
+              if (x + i < 0 || y + j < 0) {
+                  continue;
+              }
+              if (x + i >= ROWS || y + j >= COLS) {
                   continue;
               }
               if (board[x + i][y + j] === color) {
@@ -303,6 +284,9 @@ module gameLogic {
                       continue;
                   }
                   if (x + i < 0 || x + j < 0) {
+                      continue;
+                  }
+                  if (x + i >= ROWS || y + j >= COLS) {
                       continue;
                   }
                   if (board[x + i][y + j] === -1) {

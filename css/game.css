@@ -1,8 +1,49 @@
 .r {
-  border-right: 4pt solid black;
+  border-right: 2pt solid black;
+  border-left: 2pt solid black;
+  border-bottom: 2pt solid black;
 }
 .b {
-  border-bottom: 4pt solid black;
+  border-bottom: 2pt solid black;
+}
+
+.white:hover {
+  content: url(whiteStone.svg);
+}
+
+.black:hover {
+  content: url(blackStone.svg);
+}
+
+#container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("Go_13x13.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: 1px solid black;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.all {
+    border-left: 2pt solid black;
+    border-bottom: 2pt solid black;
+}
+
+.top {
+    border-left: 2pt solid black;
+    border-bottom: 2pt solid black;
+    border-top: 2pt solid black;
 }
 
 .slowlyAppear {

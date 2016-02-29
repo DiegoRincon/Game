@@ -1,93 +1,61 @@
 <!DOCTYPE html>
-<html ng-app="myApp">
+<!-- build:[manifest] index.min.appcache -->
+<html lang="en" ng-app="myApp" ng-strict-di>
+<!-- /build -->
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>TicTacToe</title>
   <meta name="description" content="TicTacToe game">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <link rel="stylesheet" type="text/css" href="http://yoav-zibin.github.io/emulator/main.css">
+  <link rel="shortcut icon"type="image/x-icon" href="data:image/x-icon;,"><!-- Suppress browser request for favicon.ico -->
+
+  <!-- To ensure CSS files are downloaded in parallel, always include external CSS before external JavaScript. -->
+  <!-- build:[href] css/everything.min.css -->
   <link rel="stylesheet" type="text/css" href="css/game.css">
+  <!-- /build -->
+  <link crossorigin="anonymous" rel="stylesheet" type="text/css" href="http://yoav-zibin.github.io/emulator/main.css">
 
-  <!--
-    Loading code to resize gameArea according to some chosen width-to-height ratio.
-    In TicTacToe, the ratio is 1 (i.e., width/height = 1)
-  -->
+  <!-- build:[href] http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css -->
+  <link crossorigin="anonymous" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.css">
+  <!-- /build -->
+
+  <!-- The crossorigin attribute controls, for scripts that are obtained from other origins, whether error information will be exposed. -->
+  <!-- build:[src] http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js -->
   <script crossorigin="anonymous" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js"></script>
+  <!-- /build -->
+
+  <!-- For the game rules/instructions, I use carousel from Angular UI + Bootstrap -->
+  <!-- build:[src] http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-touch.min.js -->
+  <script crossorigin="anonymous" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-touch.js"></script>
+  <!-- /build -->
+  <!-- build:[src] http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.min.js -->
+  <script crossorigin="anonymous" src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.js"></script>
+  <!-- /build -->
+
+  <!-- build:[src] http://yoav-zibin.github.io/emulator/dist/turnBasedServices.3.min.js -->
   <script crossorigin="anonymous" src="http://yoav-zibin.github.io/emulator/dist/turnBasedServices.3.js"></script>
-  <script>
-    angular.module('myApp', []).run(function () { resizeGameAreaService.setWidthToHeight(1); });
-  </script>
+  <!-- /build -->
+
+  <!-- build:js js/everything.min.js -->
+  <script src="ts_output_readonly_do_NOT_change_manually/src/gameLogic.js"></script>
+  <script src="ts_output_readonly_do_NOT_change_manually/src/game.js"></script>
+  <script src="ts_output_readonly_do_NOT_change_manually/src/aiService.js"></script>
+  <!-- /build -->
+
+  <!-- build:remove -->
+  <!-- https://github.com/philipwalton/html-inspector#getting-started -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/html-inspector/0.8.2/html-inspector.js"></script>
+  <!-- /build -->
+      
 </head>
-<body>
+<body ng-cloak>
 <div id="gameArea">
-  <!-- First row: ['X', 'O', ''] -->
-  <div style="position:absolute; top:0%; left:0; width:100%; height:33%;">
-    <div style="position:absolute; top:0; left:0%; width:33%; height:100%;"
-        class="r b">
-      <div style="width:100%; height: 100%">
-        <svg width="100%" height="100%">
-          <line x1="25%" y1="25%"
-                x2="75%" y2="75%"
-                stroke="red"
-                stroke-width="5%"/>
-          <line x1="25%" y1="75%"
-                x2="75%" y2="25%"
-                stroke="red"
-                stroke-width="5%"/>
-        </svg>
-      </div>
-    </div>
-    <div style="position:absolute; top:0; left:33%; width:33%; height:100%;"
-        class="r b">
-      <div style="width:100%; height: 100%">
-        <svg width="100%" height="100%">
-          <circle cx="50%" cy="50%" r="27%"
-            stroke="blue" stroke-width="5%" fill="white" />
-        </svg>
-      </div>
-    </div>
-    <div style="position:absolute; top:0; left:66%; width:33%; height:100%;"
-        class="b">
-      <div style="width:100%; height: 100%">
-      </div>
-    </div>
-  </div>
-
-  <!-- Second row: ['', '', ''] -->
-  <div style="position:absolute; top:33%; left:0; width:100%; height:33%;">
-    <div style="position:absolute; top:0; left:0%; width:33%; height:100%;"
-        class="r b">
-      <div style="width:100%; height: 100%">
-      </div>
-    </div>
-    <div style="position:absolute; top:0; left:33%; width:33%; height:100%;"
-        class="r b">
-      <div style="width:100%; height: 100%">
-      </div>
-    </div>
-    <div style="position:absolute; top:0; left:66%; width:33%; height:100%;"
-        class="b">
-      <div style="width:100%; height: 100%">
-      </div>
-    </div>
-  </div>
-
-  <!-- Third row: ['', '', ''] -->
-  <div style="position:absolute; top:66%; left:0; width:100%; height:33%;">
-    <div style="position:absolute; top:0; left:0%; width:33%; height:100%;"
-        class="r">
-      <div style="width:100%; height: 100%">
-      </div>
-    </div>
-    <div style="position:absolute; top:0; left:33%; width:33%; height:100%;"
-        class="r">
-      <div style="width:100%; height: 100%">
-      </div>
-    </div>
-    <div style="position:absolute; top:0; left:66%; width:33%; height:100%;"
-        class="">
-      <div style="width:100%; height: 100%">
-      </div>
+  <div id="container">
+    <div class="cell" ng-repeat="row in game.getNumber(19) track by $index"
+    style="position:absolute; top:{{row*5.26}}%; left:0; width:5.26%; height:5.26%;" >
+        <div class="cell" style= ng-repeat="col in game.getNumber(19) track by $index"
+        style="position:absolute; top:0; left:{{col*5.26}}%; width:5.26%; height:5.26%;" >
+        </div>
     </div>
   </div>
 </div>

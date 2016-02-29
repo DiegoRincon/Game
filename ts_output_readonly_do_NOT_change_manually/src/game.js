@@ -96,6 +96,14 @@ var game;
             }
         }
     }
+    function getNumber(num) {
+        var array = [];
+        for (var i = 0; i < num; i++) {
+            array.push(i);
+        }
+        return array;
+    }
+    game.getNumber = getNumber;
     function cellClicked(row, col) {
         log.info("Clicked on cell:", row, col);
         if (window.location.search === '?throwException') {
@@ -110,24 +118,33 @@ var game;
             moveService.makeMove(nextMove);
         }
         catch (e) {
-            log.info(["Cell is already full in position:", row, col]);
+            log.info(["That was an illegal move:", row, col]);
             return;
         }
     }
     game.cellClicked = cellClicked;
     function shouldShowImage(row, col) {
         var cell = game.state.board[row][col];
-        return cell !== "";
+        return cell !== -1;
     }
     game.shouldShowImage = shouldShowImage;
-    function isPieceX(row, col) {
-        return game.state.board[row][col] === 'X';
+    function getTurn() {
+        if (game.move.turnIndexAfterMove === gameLogic.BLACK) {
+            return "black";
+        }
+        else {
+            return "white";
+        }
     }
-    game.isPieceX = isPieceX;
-    function isPieceO(row, col) {
-        return game.state.board[row][col] === 'O';
+    game.getTurn = getTurn;
+    function isPieceWhite(row, col) {
+        return game.state.board[row][col] === gameLogic.WHITE;
     }
-    game.isPieceO = isPieceO;
+    game.isPieceWhite = isPieceWhite;
+    function isPieceBlack(row, col) {
+        return game.state.board[row][col] === gameLogic.BLACK;
+    }
+    game.isPieceBlack = isPieceBlack;
     function shouldSlowlyAppear(row, col) {
         return !game.animationEnded &&
             game.state.delta &&

@@ -106,6 +106,14 @@ module game {
       }
     }
   }
+  
+  export function getNumber(num: number): number[] {
+      let array: number[] = [];
+      for (let i=0; i<num; i++) {
+          array.push(i);
+      }
+      return array;
+  }
 
   export function cellClicked(row: number, col: number): void {
     log.info("Clicked on cell:", row, col);
@@ -121,22 +129,30 @@ module game {
       canMakeMove = false; // to prevent making another move
       moveService.makeMove(nextMove);
     } catch (e) {
-      log.info(["Cell is already full in position:", row, col]);
+      log.info(["That was an illegal move:", row, col]);
       return;
     }
   }
 
   export function shouldShowImage(row: number, col: number): boolean {
     let cell = state.board[row][col];
-    return cell !== "";
+    return cell !== -1;
+  }
+  
+  export function getTurn(): string {
+      if (move.turnIndexAfterMove === gameLogic.BLACK) {
+          return "black";
+      } else {
+          return "white";
+      }
   }
 
-  export function isPieceX(row: number, col: number): boolean {
-    return state.board[row][col] === 'X';
+  export function isPieceWhite(row: number, col: number): boolean {
+    return state.board[row][col] === gameLogic.WHITE;
   }
 
-  export function isPieceO(row: number, col: number): boolean {
-    return state.board[row][col] === 'O';
+  export function isPieceBlack(row: number, col: number): boolean {
+    return state.board[row][col] === gameLogic.BLACK;
   }
 
   export function shouldSlowlyAppear(row: number, col: number): boolean {

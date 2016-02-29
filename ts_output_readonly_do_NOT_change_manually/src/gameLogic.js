@@ -1,8 +1,8 @@
 var gameLogic;
 (function (gameLogic) {
     //TODO: Allow players to determine cells.
-    gameLogic.ROWS = 5;
-    gameLogic.COLS = 5;
+    gameLogic.ROWS = 13;
+    gameLogic.COLS = 13;
     gameLogic.BLACK = 0;
     gameLogic.WHITE = 1;
     /** Returns the initial TicTacToe board, which is a ROWSxCOLS matrix containing ''. */
@@ -23,13 +23,6 @@ var gameLogic;
         return { board: getInitialBoard(), delta: null, hasPassed: false, whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones };
     }
     gameLogic.getInitialState = getInitialState;
-    /**
-     * Returns true if the game ended in a tie because there are no empty cells.
-     * E.g., isTie returns true for the following board:
-     *     [['X', 'O', 'X'],
-     *      ['X', 'O', 'O'],
-     *      ['O', 'X', 'X']]
-     */
     function isTie(board) {
         for (var i = 0; i < gameLogic.ROWS; i++) {
             for (var j = 0; j < gameLogic.COLS; j++) {
@@ -42,19 +35,16 @@ var gameLogic;
         // No empty cells, so we have a tie!
         return true;
     }
-    /**
-     * TODO: IMPLEMENT THIS
-     */
-    function getWinner(board) {
-        return '';
-    }
     function isSuicide(board, row, col, oppColor) {
         for (var i = -1; i < 2; i++) {
             for (var j = -1; j < 2; j++) {
-                if (i === 0 && j === 0) {
+                if (Math.abs(i) === Math.abs(j)) {
                     continue;
                 }
                 if (row + i < 0 || col + j < 0) {
+                    continue;
+                }
+                if (row + i >= gameLogic.ROWS || col + j >= gameLogic.COLS) {
                     continue;
                 }
                 //oppColor will be the opponent's color
@@ -140,17 +130,19 @@ var gameLogic;
         if (delta.row === -1 && delta.col === -1) {
             hasPassed = true;
         }
+        var newWhiteStones = angular.copy(stateBeforeMove.whiteStones);
+        var newBlackStones = angular.copy(stateBeforeMove.blackStones);
         if (!hasPassed && turnIndexBeforeMove === gameLogic.WHITE) {
             var trappedStones = getTrapped(boardAfterMove, gameLogic.BLACK, stateBeforeMove.blackStones);
             removeTrappedStonesBoard(trappedStones, boardAfterMove);
-            removeTrappedStones(trappedStones, stateBeforeMove.blackStones);
+            removeTrappedStones(trappedStones, newBlackStones);
             var newStones = (trappedStones) ? trappedStones.length : 0;
             newWhiteScore = stateBeforeMove.whiteScore + newStones;
         }
         else if (!hasPassed) {
             var trappedStones = getTrapped(boardAfterMove, gameLogic.WHITE, stateBeforeMove.whiteStones);
             removeTrappedStonesBoard(trappedStones, boardAfterMove);
-            removeTrappedStones(trappedStones, stateBeforeMove.whiteStones);
+            removeTrappedStones(trappedStones, newWhiteStones);
             var newStones = (trappedStones) ? trappedStones.length : 0;
             newBlackScore = stateBeforeMove.whiteScore + newStones;
         }
@@ -165,15 +157,9 @@ var gameLogic;
         else {
             endMatchScores = null;
         }
-        var newWhiteStones = [];
-        var newBlackStones = [];
         if (!hasPassed) {
-            newWhiteStones = (turnIndexBeforeMove === gameLogic.WHITE) ? stateBeforeMove.whiteStones.concat({ row: delta.row, col: delta.col }) : stateBeforeMove.whiteStones;
-            newBlackStones = (turnIndexBeforeMove === gameLogic.BLACK) ? stateBeforeMove.blackStones.concat({ row: delta.row, col: delta.col }) : stateBeforeMove.blackStones;
-        }
-        else {
-            newWhiteStones = stateBeforeMove.whiteStones;
-            newBlackStones = stateBeforeMove.blackStones;
+            newWhiteStones = (turnIndexBeforeMove === gameLogic.WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
+            newBlackStones = (turnIndexBeforeMove === gameLogic.BLACK) ? newBlackStones.concat({ row: delta.row, col: delta.col }) : newBlackStones;
         }
         var stateAfterMove = {
             delta: delta,
@@ -230,7 +216,10 @@ var gameLogic;
                 if (Math.abs(i) === Math.abs(j)) {
                     continue;
                 }
-                if (x + i < 0 || x + j < 0) {
+                if (x + i < 0 || y + j < 0) {
+                    continue;
+                }
+                if (x + i >= gameLogic.ROWS || y + j >= gameLogic.COLS) {
                     continue;
                 }
                 if (board[x + i][y + j] === color) {
@@ -255,6 +244,9 @@ var gameLogic;
                         continue;
                     }
                     if (x + i_1 < 0 || x + j < 0) {
+                        continue;
+                    }
+                    if (x + i_1 >= gameLogic.ROWS || y + j >= gameLogic.COLS) {
                         continue;
                     }
                     if (board[x + i_1][y + j] === -1) {

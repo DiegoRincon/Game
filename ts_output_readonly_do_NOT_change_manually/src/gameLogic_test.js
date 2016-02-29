@@ -3,6 +3,8 @@ describe("In TicTacToe", function () {
     var ILLEGAL = false;
     var WHITE = gameLogic.WHITE;
     var BLACK = gameLogic.BLACK;
+    gameLogic.ROWS = 5;
+    gameLogic.COLS = 5;
     var NO_ONE_TURN = -1;
     var NO_ONE_WINS = null;
     it("placing BLACK in 0x0 from initial state is legal", function () {
@@ -121,6 +123,66 @@ describe("In TicTacToe", function () {
             [-1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, -1, -1, boardAfter, true, [{ row: 0, col: 1 }, { row: 1, col: 0 }], [{ row: 1, col: 1 }, { row: 2, col: 1 }], 4, 8, BLACK, [8, 4]);
+    });
+    it("Trapping BLACK stones work 2", function () {
+        var boardBefore = [[BLACK, -1, -1, -1, -1],
+            [WHITE, BLACK, WHITE, -1, -1],
+            [WHITE, BLACK, WHITE, BLACK, -1],
+            [-1, WHITE, BLACK, -1, -1],
+            [-1, BLACK, -1, -1, -1],];
+        var stateBeforeMove = { board: boardBefore,
+            delta: { row: 2, col: 3 },
+            hasPassed: false,
+            blackStones: [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 1, col: 3 }, { row: 3, col: 2 }, { row: 4, col: 1 }],
+            whiteStones: [{ row: 3, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 2 }, { row: 2, col: 0 }, { row: 2, col: 2 }],
+            whiteScore: 0,
+            blackScore: 0 };
+        var boardAfter = [[-1, WHITE, -1, -1, -1],
+            [WHITE, -1, WHITE, -1, -1],
+            [WHITE, -1, WHITE, BLACK, -1],
+            [-1, WHITE, BLACK, -1, -1],
+            [-1, BLACK, -1, -1, -1],];
+        expectMove(OK, WHITE, boardBefore, stateBeforeMove, 0, 1, boardAfter, false, [{ row: 3, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 2 }, { row: 2, col: 0 }, { row: 2, col: 2 }, { row: 0, col: 1 }], [{ row: 1, col: 3 }, { row: 3, col: 2 }, { row: 4, col: 1 }], 3, 0, BLACK, null);
+    });
+    it("Trapping WHITE stones work 2", function () {
+        var boardBefore = [[-1, -1, -1, WHITE, -1],
+            [-1, BLACK, WHITE, BLACK, -1],
+            [-1, WHITE, BLACK, WHITE, BLACK],
+            [-1, -1, BLACK, WHITE, BLACK],
+            [-1, -1, -1, -1, WHITE],];
+        var stateBeforeMove = { board: boardBefore,
+            delta: { row: 2, col: 3 },
+            hasPassed: false,
+            blackStones: [{ row: 1, col: 1 }, { row: 1, col: 3 }, { row: 2, col: 2 }, { row: 2, col: 4 }, { row: 3, col: 2 }, { row: 3, col: 4 }],
+            whiteStones: [{ row: 0, col: 3 }, { row: 1, col: 2 }, { row: 2, col: 1 }, { row: 2, col: 3 }, { row: 3, col: 3 }, { row: 4, col: 4 }],
+            whiteScore: 0,
+            blackScore: 0 };
+        var boardAfter = [[-1, -1, -1, WHITE, -1],
+            [-1, BLACK, WHITE, BLACK, -1],
+            [-1, WHITE, BLACK, -1, BLACK],
+            [-1, -1, BLACK, -1, BLACK],
+            [-1, -1, -1, BLACK, -1],];
+        expectMove(OK, BLACK, boardBefore, stateBeforeMove, 4, 3, boardAfter, false, [{ row: 0, col: 3 }, { row: 1, col: 2 }, { row: 2, col: 1 }], [{ row: 1, col: 1 }, { row: 1, col: 3 }, { row: 2, col: 2 }, { row: 2, col: 4 }, { row: 3, col: 2 }, { row: 3, col: 4 }, { row: 4, col: 3 }], 0, 3, WHITE, null);
+    });
+    it("Trapping BLACK stones work 3", function () {
+        var boardBefore = [[-1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1],
+            [WHITE, BLACK, WHITE, -1, -1],
+            [-1, WHITE, BLACK, BLACK, -1],
+            [BLACK, -1, -1, -1, -1],];
+        var stateBeforeMove = { board: boardBefore,
+            delta: { row: 3, col: 3 },
+            hasPassed: false,
+            blackStones: [{ row: 2, col: 1 }, { row: 4, col: 0 }, { row: 3, col: 2 }, { row: 3, col: 3 }],
+            whiteStones: [{ row: 2, col: 0 }, { row: 2, col: 2 }, { row: 3, col: 1 }],
+            whiteScore: 0,
+            blackScore: 0 };
+        var boardAfter = [[-1, -1, -1, -1, -1],
+            [-1, WHITE, -1, -1, -1],
+            [WHITE, -1, WHITE, -1, -1],
+            [-1, WHITE, BLACK, BLACK, -1],
+            [BLACK, -1, -1, -1, -1],];
+        expectMove(OK, WHITE, boardBefore, stateBeforeMove, 1, 1, boardAfter, false, [{ row: 2, col: 0 }, { row: 2, col: 2 }, { row: 3, col: 1 }, { row: 1, col: 1 }], [{ row: 4, col: 0 }, { row: 3, col: 2 }, { row: 3, col: 3 }], 1, 0, BLACK, null);
     });
     function expectMove(isOk, turnIndexBeforeMove, boardBeforeMove, stateBeforeMove, row, col, boardAfterMove, hasPassed, whiteStones, blackStones, whiteScore, blackScore, turnIndexAfterMove, endMatchScores) {
         var stateTransition = {
