@@ -124,8 +124,8 @@ var gameLogic;
         }
     }
     function endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta) {
-        var newWhiteScore = 0;
-        var newBlackScore = 0;
+        var newWhiteScore = stateBeforeMove.whiteScore;
+        var newBlackScore = stateBeforeMove.blackScore;
         var hasPassed = false;
         if (delta.row === -1 && delta.col === -1) {
             hasPassed = true;
@@ -144,7 +144,7 @@ var gameLogic;
             removeTrappedStonesBoard(trappedStones, boardAfterMove);
             removeTrappedStones(trappedStones, newWhiteStones);
             var newStones = (trappedStones) ? trappedStones.length : 0;
-            newBlackScore = stateBeforeMove.whiteScore + newStones;
+            newBlackScore = stateBeforeMove.blackScore + newStones;
         }
         if (hasPassed) {
             newWhiteScore = stateBeforeMove.whiteScore;

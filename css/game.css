@@ -7,11 +7,11 @@
   border-bottom: 2pt solid black;
 }
 
-.white:hover {
+.White:hover {
   content: url(whiteStone.svg);
 }
 
-.black:hover {
+.Black:hover {
   content: url(blackStone.svg);
 }
 
@@ -77,4 +77,10 @@ td {
 	content:'?';
 	font-weight: bold;
 	color:#fff;
+}
+
+#pass {
+    position: absolute;
+    top: 5%;
+    left:10%;
 }

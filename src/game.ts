@@ -40,7 +40,15 @@ module game {
       }, 3000);
     }
   }
-
+  
+  export function getWhiteScore(): number {
+      return state.whiteScore;
+  }
+  
+  export function getBlackScore(): number {
+      return state.blackScore;
+  }
+  
   function getTranslations(): Translations {
     return {
       RULES_OF_TICTACTOE: {
@@ -141,9 +149,9 @@ module game {
   
   export function getTurn(): string {
       if (move.turnIndexAfterMove === gameLogic.BLACK) {
-          return "black";
+          return "Black";
       } else {
-          return "white";
+          return "White";
       }
   }
 

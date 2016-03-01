@@ -158,8 +158,8 @@ module gameLogic {
   }
   
   function endOfTurnMove(boardAfterMove: Board, gameEnded: Boolean, turnIndexBeforeMove: number, stateBeforeMove: IState, delta: BoardDelta): IMove {
-      let newWhiteScore: number = 0;
-      let newBlackScore: number = 0;
+      let newWhiteScore: number = stateBeforeMove.whiteScore;
+      let newBlackScore: number = stateBeforeMove.blackScore;
       let hasPassed: boolean = false;
       if (delta.row === -1 && delta.col === -1) {
           hasPassed = true;
@@ -179,7 +179,7 @@ module gameLogic {
           removeTrappedStones(trappedStones, newWhiteStones);
           
           let newStones: number = (trappedStones) ? trappedStones.length: 0;
-          newBlackScore = stateBeforeMove.whiteScore + newStones;
+          newBlackScore = stateBeforeMove.blackScore + newStones;
       }
       if (hasPassed) {
           newWhiteScore = stateBeforeMove.whiteScore;

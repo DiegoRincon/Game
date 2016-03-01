@@ -35,6 +35,14 @@ var game;
         }
     }
     game.init = init;
+    function getWhiteScore() {
+        return game.state.whiteScore;
+    }
+    game.getWhiteScore = getWhiteScore;
+    function getBlackScore() {
+        return game.state.blackScore;
+    }
+    game.getBlackScore = getBlackScore;
     function getTranslations() {
         return {
             RULES_OF_TICTACTOE: {
@@ -130,10 +138,10 @@ var game;
     game.shouldShowImage = shouldShowImage;
     function getTurn() {
         if (game.move.turnIndexAfterMove === gameLogic.BLACK) {
-            return "black";
+            return "Black";
         }
         else {
-            return "white";
+            return "White";
         }
     }
     game.getTurn = getTurn;
