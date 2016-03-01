@@ -100,7 +100,8 @@
     <p>Turn: {{ game.getTurn() }}</p>
     <p>White Score: {{ game.getWhiteScore() }}</p>
     <p>Black Score: {{ game.getBlackScore() }}</p>
-    <input type="button" value="Pass" ng-click="game.cellClicked(-1,-1)" />
+    <input id="passB" type="button" value="Pass" ng-click="game.cellClicked(-1,-1)" />
+    <input class="ph" type="button" value="State" />
 </div>
 <div id="gameArea">
   <div id="container">
