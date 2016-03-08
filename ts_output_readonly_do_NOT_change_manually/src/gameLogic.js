@@ -151,11 +151,14 @@ var gameLogic;
             newBlackScore = stateBeforeMove.blackScore;
         }
         var endMatchScores;
+        var turnIndexAfterMove;
         if (gameEnded) {
             endMatchScores = [newBlackScore, newWhiteScore];
+            turnIndexAfterMove = -1;
         }
         else {
             endMatchScores = null;
+            turnIndexAfterMove = (turnIndexBeforeMove == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
         }
         if (!hasPassed) {
             newWhiteStones = (turnIndexBeforeMove === gameLogic.WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
@@ -169,7 +172,7 @@ var gameLogic;
             blackScore: newBlackScore,
             whiteStones: newWhiteStones,
             blackStones: newBlackStones };
-        return { endMatchScores: endMatchScores, turnIndexAfterMove: (turnIndexBeforeMove == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE, stateAfterMove: stateAfterMove };
+        return { endMatchScores: endMatchScores, turnIndexAfterMove: turnIndexAfterMove, stateAfterMove: stateAfterMove };
     }
     function getTrapped(board, color, colorStones) {
         var trapped = [];

@@ -186,10 +186,13 @@ module gameLogic {
           newBlackScore = stateBeforeMove.blackScore;
       }
       let endMatchScores : number[];
+      let turnIndexAfterMove: number;
       if (gameEnded) {
           endMatchScores = [newBlackScore, newWhiteScore];
+          turnIndexAfterMove = -1;
       } else {
           endMatchScores = null;
+          turnIndexAfterMove = (turnIndexBeforeMove == WHITE) ? BLACK : WHITE;
       }
       if (!hasPassed) {
           newWhiteStones = (turnIndexBeforeMove === WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
@@ -203,7 +206,7 @@ module gameLogic {
           blackScore: newBlackScore,
           whiteStones: newWhiteStones,
           blackStones: newBlackStones };
-      return {endMatchScores: endMatchScores, turnIndexAfterMove: (turnIndexBeforeMove == WHITE) ? BLACK : WHITE, stateAfterMove: stateAfterMove};
+      return {endMatchScores: endMatchScores, turnIndexAfterMove: turnIndexAfterMove, stateAfterMove: stateAfterMove};
   }
 
   function getTrapped(board: Board, color: number, colorStones: Stone[]): Stone[] {

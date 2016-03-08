@@ -35,6 +35,13 @@ var game;
         }
     }
     game.init = init;
+    function getWinner() {
+        if (getFinalBlackScore() > getFinalWhiteScore()) {
+            return "Black";
+        }
+        return "White";
+    }
+    game.getWinner = getWinner;
     function getWhiteScore() {
         return game.state.whiteScore;
     }
@@ -43,6 +50,22 @@ var game;
         return game.state.blackScore;
     }
     game.getBlackScore = getBlackScore;
+    function isGameOngoing() {
+        return game.move.turnIndexAfterMove !== -1;
+    }
+    game.isGameOngoing = isGameOngoing;
+    function isGameOver() {
+        return game.move.turnIndexAfterMove === -1;
+    }
+    game.isGameOver = isGameOver;
+    function getFinalWhiteScore() {
+        return game.move.endMatchScores[gameLogic.WHITE];
+    }
+    game.getFinalWhiteScore = getFinalWhiteScore;
+    function getFinalBlackScore() {
+        return game.move.endMatchScores[gameLogic.BLACK];
+    }
+    game.getFinalBlackScore = getFinalBlackScore;
     function getTranslations() {
         return {
             RULES_OF_TICTACTOE: {

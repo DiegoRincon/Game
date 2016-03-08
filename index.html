@@ -104,7 +104,8 @@
     <input class="ph" type="button" value="State" />
 </div>
 <div id="gameArea">
-  <div id="container">
+  <div id="container"
+  ng-if="game.isGameOngoing()">
     <div ng-repeat="row in game.getNumber(13) track by $index"
     style="position:absolute; top:{{row*7.6923}}%; left:0; width:7.6923%; height:7.6923%;" >
         <div ng-repeat="col in game.getNumber(13) track by $index"
@@ -120,6 +121,11 @@
             </div>
         </div>
     </div>
+  </div>
+  <div ng-if="game.isGameOver()">
+    <p>Winner: {{ game.getWinner() }} </p>
+    <p>White Score: {{ game.getFinalWhiteScore() }}</p>
+    <p>Black Score: {{ game.getFinalBlackScore() }}</p>
   </div>
 </div>
 

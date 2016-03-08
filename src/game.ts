@@ -41,12 +41,35 @@ module game {
     }
   }
   
+  export function getWinner(): string {
+      if (getFinalBlackScore() > getFinalWhiteScore()) {
+          return "Black";
+      }
+      return "White";
+  }
+  
   export function getWhiteScore(): number {
       return state.whiteScore;
   }
   
   export function getBlackScore(): number {
       return state.blackScore;
+  }
+  
+  export function isGameOngoing(): boolean {
+      return move.turnIndexAfterMove !== -1;
+  }
+  
+  export function isGameOver(): boolean {
+      return move.turnIndexAfterMove === -1;
+  }
+  
+  export function getFinalWhiteScore(): number {
+      return move.endMatchScores[gameLogic.WHITE];
+  }
+  
+  export function getFinalBlackScore(): number {
+      return move.endMatchScores[gameLogic.BLACK];
   }
   
   function getTranslations(): Translations {
