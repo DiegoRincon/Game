@@ -58,7 +58,16 @@ module gameLogic {
     return true;
   }
   
-  function isSuicide(board: Board, row: number, col: number, oppColor: number): boolean {
+  function isSuicide(board: Board, row: number, col: number, oppColor: number, stateBeforeMove: IState): boolean {
+      let newBoard = angular.copy(board);
+      newBoard[row][col] = (oppColor == WHITE) ? BLACK : WHITE;
+      
+      let oppStones = (oppColor == WHITE) ? stateBeforeMove.whiteStones : stateBeforeMove.blackStones;
+      let trappedStones: Stone[] = getTrapped(newBoard, oppColor, oppStones);
+      if (trappedStones.length >= 0) {
+          return false;
+      }
+            
       for (let i = -1; i < 2; i++) {
           for (let j = -1; j < 2; j++) {
               if (Math.abs(i) === Math.abs(j)) {
@@ -91,13 +100,12 @@ module gameLogic {
       }
       //Make sure you are not suiciding
       let color = (turnIndexBeforeMove === 1) ? 0 : 1;
-      if (isSuicide(board, row, col, color)) {
+      if (isSuicide(board, row, col, color, stateBeforeMove)) {
           throw new Error("You cannot make a suicide move");
       }
       return true;
   }
   
-
   /**
    * Returns the move that should be performed when player
    * with index turnIndexBeforeMove makes a move in cell row X col.
@@ -231,11 +239,7 @@ module gameLogic {
       return trapped;
       
   } 
- 
-  
-  /**
-   * Returns a connected sequence of white stones that are not contained in Seen. Null if none.
-   */
+   
   function getConnected(seen: Stone[], board: Board, stones: Stone[], color: number): Stone[] {
       for (let i = 0; i < stones.length; i++) {
           let stone: Stone = stones[i];
@@ -248,6 +252,37 @@ module gameLogic {
       return null;
   }
   
+  function getTerritory(board: Board, color: number) : number {
+      let seen : Stone[] = [];
+      let score = 0;
+      for (let row = 0; row < ROWS; row++) {
+          for (let col = 0; col < COLS; col++) {
+              if (board[row][col] !== -1) {
+                  continue;
+              }
+              let stone = {row: row, col: col};
+              if (isStoneInArray(stone, seen)) {
+                  continue;
+              }
+              let connected: Stone[] = [];
+              getAllConnectedFromStone(stone, board, -1, connected);
+              if (areStonesInTerritory(color, connected, board)) {
+                  score += connected.length;
+              }
+              seen = seen.concat(connected);
+          }
+      }      
+      return score;    
+  }
+    
+  export function getWhiteTerritory(state : IState) : number {
+      return getTerritory(state.board, WHITE);
+  }
+  
+  export function getBlackTerritory(state : IState) : number { 
+      return getTerritory(state.board, BLACK);
+  }
+    
   function getAllConnectedFromStone(stone: Stone, board: Board, color: number, visited: Stone[]): Stone[] {
       visited.push(stone);
       let x = stone.row;
@@ -274,6 +309,36 @@ module gameLogic {
           }
       }
       return visited;
+  }
+  
+  function areStonesInTerritory(color: number, stones: Stone[], board: Board) {
+      for (let r = 0; r < stones.length; r++) {
+          let stone = stones[r];
+          let x = stone.row;
+          let y = stone.col;
+          for (let i = -1; i < 2; i++) {
+              for (let j = -1; j < 2; j++) {
+                  if (Math.abs(i) === Math.abs(j)) {
+                      continue;
+                  }
+                  let newRow = x+i;
+                  let newCol = y+j;
+                  if (newRow < 0 || newCol < 0) {
+                      continue;
+                  }
+                  if (newRow >= ROWS || newCol >= COLS) {
+                      continue;
+                  }
+                  if (board[newRow][newCol] === -1) {
+                      continue;
+                  }
+                  if (board[newRow][newCol] !== color) {
+                      return false;
+                  }
+              }
+          }
+      }
+      return true;
   }
   
   function stonesHaveExit(stones: Stone[], board: Board): boolean {

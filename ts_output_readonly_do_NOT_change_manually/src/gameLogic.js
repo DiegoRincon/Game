@@ -35,7 +35,14 @@ var gameLogic;
         // No empty cells, so we have a tie!
         return true;
     }
-    function isSuicide(board, row, col, oppColor) {
+    function isSuicide(board, row, col, oppColor, stateBeforeMove) {
+        var newBoard = angular.copy(board);
+        newBoard[row][col] = (oppColor == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
+        var oppStones = (oppColor == gameLogic.WHITE) ? stateBeforeMove.whiteStones : stateBeforeMove.blackStones;
+        var trappedStones = getTrapped(newBoard, oppColor, oppStones);
+        if (trappedStones.length >= 0) {
+            return false;
+        }
         for (var i = -1; i < 2; i++) {
             for (var j = -1; j < 2; j++) {
                 if (Math.abs(i) === Math.abs(j)) {
@@ -66,7 +73,7 @@ var gameLogic;
         }
         //Make sure you are not suiciding
         var color = (turnIndexBeforeMove === 1) ? 0 : 1;
-        if (isSuicide(board, row, col, color)) {
+        if (isSuicide(board, row, col, color, stateBeforeMove)) {
             throw new Error("You cannot make a suicide move");
         }
         return true;
@@ -196,9 +203,6 @@ var gameLogic;
         }
         return trapped;
     }
-    /**
-     * Returns a connected sequence of white stones that are not contained in Seen. Null if none.
-     */
     function getConnected(seen, board, stones, color) {
         for (var i = 0; i < stones.length; i++) {
             var stone = stones[i];
@@ -210,6 +214,36 @@ var gameLogic;
         }
         return null;
     }
+    function getTerritory(board, color) {
+        var seen = [];
+        var score = 0;
+        for (var row = 0; row < gameLogic.ROWS; row++) {
+            for (var col = 0; col < gameLogic.COLS; col++) {
+                if (board[row][col] !== -1) {
+                    continue;
+                }
+                var stone = { row: row, col: col };
+                if (isStoneInArray(stone, seen)) {
+                    continue;
+                }
+                var connected = [];
+                getAllConnectedFromStone(stone, board, -1, connected);
+                if (areStonesInTerritory(color, connected, board)) {
+                    score += connected.length;
+                }
+                seen = seen.concat(connected);
+            }
+        }
+        return score;
+    }
+    function getWhiteTerritory(state) {
+        return getTerritory(state.board, gameLogic.WHITE);
+    }
+    gameLogic.getWhiteTerritory = getWhiteTerritory;
+    function getBlackTerritory(state) {
+        return getTerritory(state.board, gameLogic.BLACK);
+    }
+    gameLogic.getBlackTerritory = getBlackTerritory;
     function getAllConnectedFromStone(stone, board, color, visited) {
         visited.push(stone);
         var x = stone.row;
@@ -235,6 +269,35 @@ var gameLogic;
             }
         }
         return visited;
+    }
+    function areStonesInTerritory(color, stones, board) {
+        for (var r = 0; r < stones.length; r++) {
+            var stone = stones[r];
+            var x = stone.row;
+            var y = stone.col;
+            for (var i = -1; i < 2; i++) {
+                for (var j = -1; j < 2; j++) {
+                    if (Math.abs(i) === Math.abs(j)) {
+                        continue;
+                    }
+                    var newRow = x + i;
+                    var newCol = y + j;
+                    if (newRow < 0 || newCol < 0) {
+                        continue;
+                    }
+                    if (newRow >= gameLogic.ROWS || newCol >= gameLogic.COLS) {
+                        continue;
+                    }
+                    if (board[newRow][newCol] === -1) {
+                        continue;
+                    }
+                    if (board[newRow][newCol] !== color) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
     function stonesHaveExit(stones, board) {
         for (var i = 0; i < stones.length; i++) {

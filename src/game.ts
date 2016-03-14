@@ -75,16 +75,20 @@ module game {
   function getTranslations(): Translations {
     return {
       RULES_OF_TICTACTOE: {
-        en: "Rules of My Game (Change This)",
+        en: "Rules of Go",
         iw: "חוקי המשחק",
       },
       RULES_SLIDE1: {
-        en: "You and your opponent take turns to mark the grid in an empty spot. The first mark is X, then O, then X, then O, etc.",
+        en: "Black makes the first move, after which White and Black alternate. You can only place one stone per turn. A player can pass their turn at any time.",
         iw: "אתה והיריב מסמנים איקס או עיגול כל תור",
       },
       RULES_SLIDE2: {
-        en: "The first to mark a whole row, column or diagonal wins.",
+        en: "A stone or solidly connected group of stones of one color is captured and removed from the board when all the intersections directly adjacent to it are occupied by the enemy.",
         iw: "הראשון שמסמן שורה, עמודה או אלכסון מנצח",
+      },
+      RULES_SLIDE3: {
+        en: "No stone may be played so as to recreate a former board state. Two consecutive passes end the game. ",
+        iw: "",
       },
       CLOSE:  {
         en: "Close",
