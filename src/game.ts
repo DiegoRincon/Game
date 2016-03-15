@@ -181,6 +181,19 @@ module game {
           return "White";
       }
   }
+  
+  export function resign(player : string): void {
+    // if row == -1 and col == 0 then black resigned
+    // if row == 0 and col == -1 then white resigned
+    if (player === "Black") {
+        return cellClicked(-1, 0);
+    } else if (player === "White") {
+        return cellClicked(0, -1);
+    }
+    throw Error("Resign function didn't get a valid parameter");
+    
+  }
+  
 
   export function isPieceWhite(row: number, col: number): boolean {
     return state.board[row][col] === gameLogic.WHITE;
@@ -188,6 +201,14 @@ module game {
 
   export function isPieceBlack(row: number, col: number): boolean {
     return state.board[row][col] === gameLogic.BLACK;
+  }
+  
+  export function isPieceWhiteTerritory(row: number, col: number): boolean {
+    return state.board[row][col] === gameLogic.WHITETERR;
+  }
+  
+  export function isPieceBlackTerritory(row: number, col: number): boolean {
+    return state.board[row][col] === gameLogic.BLACKTERR;
   }
 
   export function shouldSlowlyAppear(row: number, col: number): boolean {

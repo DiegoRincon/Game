@@ -172,6 +172,18 @@ var game;
         }
     }
     game.getTurn = getTurn;
+    function resign(player) {
+        // if row == -1 and col == 0 then black resigned
+        // if row == 0 and col == -1 then white resigned
+        if (player === "Black") {
+            return cellClicked(-1, 0);
+        }
+        else if (player === "White") {
+            return cellClicked(0, -1);
+        }
+        throw Error("Resign function didn't get a valid parameter");
+    }
+    game.resign = resign;
     function isPieceWhite(row, col) {
         return game.state.board[row][col] === gameLogic.WHITE;
     }
@@ -180,6 +192,14 @@ var game;
         return game.state.board[row][col] === gameLogic.BLACK;
     }
     game.isPieceBlack = isPieceBlack;
+    function isPieceWhiteTerritory(row, col) {
+        return game.state.board[row][col] === gameLogic.WHITETERR;
+    }
+    game.isPieceWhiteTerritory = isPieceWhiteTerritory;
+    function isPieceBlackTerritory(row, col) {
+        return game.state.board[row][col] === gameLogic.BLACKTERR;
+    }
+    game.isPieceBlackTerritory = isPieceBlackTerritory;
     function shouldSlowlyAppear(row, col) {
         return !game.animationEnded &&
             game.state.delta &&

@@ -5,6 +5,9 @@ var gameLogic;
     gameLogic.COLS = 13;
     gameLogic.BLACK = 0;
     gameLogic.WHITE = 1;
+    gameLogic.BLACKTERR = 2;
+    gameLogic.WHITETERR = 3;
+    gameLogic.KOMI = 6.5;
     /** Returns the initial TicTacToe board, which is a ROWSxCOLS matrix containing ''. */
     function getInitialBoard() {
         var board = [];
@@ -83,6 +86,9 @@ var gameLogic;
      * with index turnIndexBeforeMove makes a move in cell row X col.
      */
     function createMove(stateBeforeMove, row, col, turnIndexBeforeMove) {
+        // TODO: remove this hacky thing
+        // if row == -1 and col == 0 then black resigned
+        // if row == 0 and col == -1 then white resigned
         if (!stateBeforeMove) {
             stateBeforeMove = getInitialState();
         }
@@ -96,7 +102,17 @@ var gameLogic;
         if (row === -1 && col === -1) {
             gameEnded = (stateBeforeMove.hasPassed) ? true : false;
             var delta_1 = { row: row, col: col };
-            return endOfTurnMove(board, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta_1);
+            return endOfTurnMove(board, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta_1, -1);
+        }
+        if (row === -1 && col === 0) {
+            //black resigned
+            var delta_2 = { row: row, col: col };
+            return endOfTurnMove(board, true, turnIndexBeforeMove, stateBeforeMove, delta_2, gameLogic.BLACK);
+        }
+        if (row === 0 && col === -1) {
+            //white resigned
+            var delta_3 = { row: row, col: col };
+            return endOfTurnMove(board, true, turnIndexBeforeMove, stateBeforeMove, delta_3, gameLogic.WHITE);
         }
         if (!isLegalMove(stateBeforeMove, row, col, turnIndexBeforeMove)) {
             throw Error("Not a legal move!");
@@ -105,7 +121,7 @@ var gameLogic;
         var boardAfterMove = angular.copy(board);
         boardAfterMove[row][col] = turnIndexBeforeMove;
         var delta = { row: row, col: col };
-        return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta);
+        return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta, -1);
     }
     gameLogic.createMove = createMove;
     function removeTrappedStonesBoard(trappedStones, board) {
@@ -130,7 +146,7 @@ var gameLogic;
             }
         }
     }
-    function endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta) {
+    function endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta, resigned) {
         var newWhiteScore = stateBeforeMove.whiteScore;
         var newBlackScore = stateBeforeMove.blackScore;
         var hasPassed = false;
@@ -139,11 +155,16 @@ var gameLogic;
         }
         var newWhiteStones = angular.copy(stateBeforeMove.whiteStones);
         var newBlackStones = angular.copy(stateBeforeMove.blackStones);
+        if (!hasPassed) {
+            newWhiteStones = (turnIndexBeforeMove === gameLogic.WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
+            newBlackStones = (turnIndexBeforeMove === gameLogic.BLACK) ? newBlackStones.concat({ row: delta.row, col: delta.col }) : newBlackStones;
+        }
         if (!hasPassed && turnIndexBeforeMove === gameLogic.WHITE) {
             var trappedStones = getTrapped(boardAfterMove, gameLogic.BLACK, stateBeforeMove.blackStones);
             removeTrappedStonesBoard(trappedStones, boardAfterMove);
             removeTrappedStones(trappedStones, newBlackStones);
             var newStones = (trappedStones) ? trappedStones.length : 0;
+            //newWhiteScore = getWhiteTerritory(boardAfterMove, newWhiteStones.length);
             newWhiteScore = stateBeforeMove.whiteScore + newStones;
         }
         else if (!hasPassed) {
@@ -151,6 +172,7 @@ var gameLogic;
             removeTrappedStonesBoard(trappedStones, boardAfterMove);
             removeTrappedStones(trappedStones, newWhiteStones);
             var newStones = (trappedStones) ? trappedStones.length : 0;
+            //newBlackScore = getBlackTerritory(boardAfterMove, newBlackStones.length);
             newBlackScore = stateBeforeMove.blackScore + newStones;
         }
         if (hasPassed) {
@@ -160,16 +182,27 @@ var gameLogic;
         var endMatchScores;
         var turnIndexAfterMove;
         if (gameEnded) {
-            endMatchScores = [newBlackScore, newWhiteScore];
-            turnIndexAfterMove = -1;
+            if (resigned === gameLogic.BLACK) {
+                endMatchScores = [0, 1];
+                boardAfterMove = placeTerritories(boardAfterMove);
+                turnIndexAfterMove = -1;
+            }
+            else if (resigned === gameLogic.WHITE) {
+                endMatchScores = [1, 0];
+                boardAfterMove = placeTerritories(boardAfterMove);
+                turnIndexAfterMove = -1;
+            }
+            else {
+                var finalWhiteScore = getWhiteTerritory(boardAfterMove, newWhiteStones.length);
+                var finalBlackScore = getBlackTerritory(boardAfterMove, newBlackStones.length);
+                endMatchScores = [finalBlackScore, finalWhiteScore];
+                boardAfterMove = placeTerritories(boardAfterMove);
+                turnIndexAfterMove = -1;
+            }
         }
         else {
             endMatchScores = null;
             turnIndexAfterMove = (turnIndexBeforeMove == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
-        }
-        if (!hasPassed) {
-            newWhiteStones = (turnIndexBeforeMove === gameLogic.WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
-            newBlackStones = (turnIndexBeforeMove === gameLogic.BLACK) ? newBlackStones.concat({ row: delta.row, col: delta.col }) : newBlackStones;
         }
         var stateAfterMove = {
             delta: delta,
@@ -216,6 +249,7 @@ var gameLogic;
     }
     function getTerritory(board, color) {
         var seen = [];
+        var territory = [];
         var score = 0;
         for (var row = 0; row < gameLogic.ROWS; row++) {
             for (var col = 0; col < gameLogic.COLS; col++) {
@@ -230,18 +264,33 @@ var gameLogic;
                 getAllConnectedFromStone(stone, board, -1, connected);
                 if (areStonesInTerritory(color, connected, board)) {
                     score += connected.length;
+                    territory = territory.concat(connected);
                 }
                 seen = seen.concat(connected);
             }
         }
-        return score;
+        return territory;
     }
-    function getWhiteTerritory(state) {
-        return getTerritory(state.board, gameLogic.WHITE);
+    function placeTerritories(board) {
+        var whiteTerr = getTerritory(board, gameLogic.WHITE);
+        var blackTerr = getTerritory(board, gameLogic.BLACK);
+        var newBoard = angular.copy(board);
+        for (var i = 0; i < whiteTerr.length; i++) {
+            var stone = whiteTerr[i];
+            newBoard[stone.row][stone.col] = gameLogic.WHITETERR;
+        }
+        for (var i = 0; i < blackTerr.length; i++) {
+            var stone = blackTerr[i];
+            newBoard[stone.row][stone.col] = gameLogic.BLACKTERR;
+        }
+        return newBoard;
+    }
+    function getWhiteTerritory(board, numWhiteStones) {
+        return getTerritory(board, gameLogic.WHITE).length + gameLogic.KOMI + numWhiteStones;
     }
     gameLogic.getWhiteTerritory = getWhiteTerritory;
-    function getBlackTerritory(state) {
-        return getTerritory(state.board, gameLogic.BLACK);
+    function getBlackTerritory(board, numBlackStones) {
+        return getTerritory(board, gameLogic.BLACK).length + numBlackStones;
     }
     gameLogic.getBlackTerritory = getBlackTerritory;
     function getAllConnectedFromStone(stone, board, color, visited) {

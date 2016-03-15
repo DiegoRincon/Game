@@ -25,6 +25,9 @@ module gameLogic {
   export let COLS : number = 13;
   export const BLACK = 0;
   export const WHITE = 1;
+  export const BLACKTERR = 2;
+  export const WHITETERR = 3;
+  export const KOMI = 6.5;
 
   /** Returns the initial TicTacToe board, which is a ROWSxCOLS matrix containing ''. */
   function getInitialBoard(): Board {
@@ -112,6 +115,10 @@ module gameLogic {
    */
   export function createMove(
       stateBeforeMove: IState, row: number, col: number, turnIndexBeforeMove: number): IMove {
+          
+    // TODO: remove this hacky thing
+    // if row == -1 and col == 0 then black resigned
+    // if row == 0 and col == -1 then white resigned
     if (!stateBeforeMove) { // stateBeforeMove is null in a new match.
       stateBeforeMove = getInitialState();
     }
@@ -126,7 +133,17 @@ module gameLogic {
     if (row === -1 && col === -1) {
         gameEnded = (stateBeforeMove.hasPassed) ? true : false;
         let delta: BoardDelta = {row: row, col: col};
-        return endOfTurnMove(board, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta);
+        return endOfTurnMove(board, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta, -1);
+    }
+    if (row === -1 && col === 0) {
+        //black resigned
+        let delta: BoardDelta = {row: row, col: col};
+        return endOfTurnMove(board, true, turnIndexBeforeMove, stateBeforeMove, delta, BLACK);
+    }
+    if (row === 0 && col === -1) {
+        //white resigned
+        let delta: BoardDelta = {row: row, col: col};
+        return endOfTurnMove(board, true, turnIndexBeforeMove, stateBeforeMove, delta, WHITE);        
     }
     
     if (!isLegalMove(stateBeforeMove,row,col,turnIndexBeforeMove)) {
@@ -138,7 +155,7 @@ module gameLogic {
     let boardAfterMove = angular.copy(board);
     boardAfterMove[row][col] = turnIndexBeforeMove;
     let delta: BoardDelta = {row: row, col: col};
-    return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta);
+    return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta, -1);
   }
   
   function removeTrappedStonesBoard(trappedStones: Stone[], board: Board): void {
@@ -165,7 +182,7 @@ module gameLogic {
       }
   }
   
-  function endOfTurnMove(boardAfterMove: Board, gameEnded: Boolean, turnIndexBeforeMove: number, stateBeforeMove: IState, delta: BoardDelta): IMove {
+  function endOfTurnMove(boardAfterMove: Board, gameEnded: Boolean, turnIndexBeforeMove: number, stateBeforeMove: IState, delta: BoardDelta, resigned: number): IMove {
       let newWhiteScore: number = stateBeforeMove.whiteScore;
       let newBlackScore: number = stateBeforeMove.blackScore;
       let hasPassed: boolean = false;
@@ -174,12 +191,17 @@ module gameLogic {
       }
       let newWhiteStones: Stone[] = angular.copy(stateBeforeMove.whiteStones);
       let newBlackStones: Stone[] = angular.copy(stateBeforeMove.blackStones);
+      if (!hasPassed) {
+          newWhiteStones = (turnIndexBeforeMove === WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
+          newBlackStones = (turnIndexBeforeMove === BLACK) ? newBlackStones.concat({ row: delta.row, col: delta.col }) : newBlackStones;
+      }
       if (!hasPassed && turnIndexBeforeMove === WHITE) {
           let trappedStones = getTrapped(boardAfterMove, BLACK, stateBeforeMove.blackStones);
           removeTrappedStonesBoard(trappedStones, boardAfterMove);
           removeTrappedStones(trappedStones, newBlackStones);
           
           let newStones: number = (trappedStones) ? trappedStones.length: 0;
+          //newWhiteScore = getWhiteTerritory(boardAfterMove, newWhiteStones.length);
           newWhiteScore = stateBeforeMove.whiteScore + newStones;
       } else if (!hasPassed) {          
           let trappedStones = getTrapped(boardAfterMove, WHITE, stateBeforeMove.whiteStones);
@@ -187,6 +209,7 @@ module gameLogic {
           removeTrappedStones(trappedStones, newWhiteStones);
           
           let newStones: number = (trappedStones) ? trappedStones.length: 0;
+          //newBlackScore = getBlackTerritory(boardAfterMove, newBlackStones.length);
           newBlackScore = stateBeforeMove.blackScore + newStones;
       }
       if (hasPassed) {
@@ -196,15 +219,24 @@ module gameLogic {
       let endMatchScores : number[];
       let turnIndexAfterMove: number;
       if (gameEnded) {
-          endMatchScores = [newBlackScore, newWhiteScore];
-          turnIndexAfterMove = -1;
+          if (resigned === BLACK) {
+              endMatchScores = [0, 1];
+              boardAfterMove = placeTerritories(boardAfterMove);
+              turnIndexAfterMove = -1;
+          } else if (resigned === WHITE) {
+              endMatchScores = [1, 0];
+              boardAfterMove = placeTerritories(boardAfterMove);
+              turnIndexAfterMove = -1;
+          } else {
+              let finalWhiteScore = getWhiteTerritory(boardAfterMove, newWhiteStones.length);
+              let finalBlackScore = getBlackTerritory(boardAfterMove, newBlackStones.length);
+              endMatchScores = [finalBlackScore, finalWhiteScore];
+              boardAfterMove = placeTerritories(boardAfterMove);
+              turnIndexAfterMove = -1;
+          }
       } else {
           endMatchScores = null;
           turnIndexAfterMove = (turnIndexBeforeMove == WHITE) ? BLACK : WHITE;
-      }
-      if (!hasPassed) {
-          newWhiteStones = (turnIndexBeforeMove === WHITE) ? newWhiteStones.concat({ row: delta.row, col: delta.col }) : newWhiteStones;
-          newBlackStones = (turnIndexBeforeMove === BLACK) ? newBlackStones.concat({ row: delta.row, col: delta.col }) : newBlackStones;
       }
       let stateAfterMove: IState = {
           delta: delta,
@@ -252,8 +284,9 @@ module gameLogic {
       return null;
   }
   
-  function getTerritory(board: Board, color: number) : number {
+  function getTerritory(board: Board, color: number) : Stone[] {
       let seen : Stone[] = [];
+      let territory : Stone[] = [];
       let score = 0;
       for (let row = 0; row < ROWS; row++) {
           for (let col = 0; col < COLS; col++) {
@@ -268,19 +301,35 @@ module gameLogic {
               getAllConnectedFromStone(stone, board, -1, connected);
               if (areStonesInTerritory(color, connected, board)) {
                   score += connected.length;
+                  territory = territory.concat(connected);
               }
               seen = seen.concat(connected);
           }
       }      
-      return score;    
-  }
-    
-  export function getWhiteTerritory(state : IState) : number {
-      return getTerritory(state.board, WHITE);
+      return territory;    
   }
   
-  export function getBlackTerritory(state : IState) : number { 
-      return getTerritory(state.board, BLACK);
+  function placeTerritories(board : Board) : Board {
+      let whiteTerr = getTerritory(board, WHITE);
+      let blackTerr = getTerritory(board, BLACK);
+      let newBoard = angular.copy(board);
+      for (let i=0; i < whiteTerr.length; i++) {
+          let stone = whiteTerr[i];
+          newBoard[stone.row][stone.col] = WHITETERR;
+      }
+      for (let i=0; i < blackTerr.length; i++) {
+          let stone = blackTerr[i];
+          newBoard[stone.row][stone.col] = BLACKTERR;
+      }
+      return newBoard;
+  }
+      
+  export function getWhiteTerritory(board : Board, numWhiteStones: number) : number {
+      return getTerritory(board, WHITE).length + KOMI + numWhiteStones;
+  }
+  
+  export function getBlackTerritory(board : Board, numBlackStones: number) : number { 
+      return getTerritory(board, BLACK).length + numBlackStones;
   }
     
   function getAllConnectedFromStone(stone: Stone, board: Board, color: number, visited: Stone[]): Stone[] {

@@ -117,12 +117,12 @@ describe("In TicTacToe", function () {
             whiteStones: [{ row: 0, col: 1 }, { row: 1, col: 0 }],
             whiteScore: 4,
             blackScore: 8 };
-        var boardAfter = [[-1, WHITE, -1, -1, -1],
+        var boardAfter = [[gameLogic.WHITETERR, WHITE, -1, -1, -1],
             [WHITE, BLACK, -1, -1, -1],
             [-1, BLACK, -1, -1, -1],
             [-1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],];
-        expectMove(OK, WHITE, boardBefore, stateBeforeMove, -1, -1, boardAfter, true, [{ row: 0, col: 1 }, { row: 1, col: 0 }], [{ row: 1, col: 1 }, { row: 2, col: 1 }], 4, 8, BLACK, [8, 4]);
+        expectMove(OK, WHITE, boardBefore, stateBeforeMove, -1, -1, boardAfter, true, [{ row: 0, col: 1 }, { row: 1, col: 0 }], [{ row: 1, col: 1 }, { row: 2, col: 1 }], 4, 8, -1, [2, 9.5]);
     });
     it("Trapping BLACK stones work 2", function () {
         var boardBefore = [[BLACK, -1, -1, -1, -1],
