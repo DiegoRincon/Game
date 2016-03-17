@@ -1,19 +1,22 @@
-.r {
-  border-right: 2pt solid black;
-  border-left: 2pt solid black;
-  border-bottom: 2pt solid black;
+.container13 {    
+    background-image: url("Go_13x13.png");
 }
-.b {
-  border-bottom: 2pt solid black;
+
+.container19 {    
+    background-image: url("Go_19x19.png");
+}
+
+.container9 {    
+    background-image: url("Go_9x9.png");
 }
 
 #container {
+    display: none;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url("Go_13x13.png");
     background-repeat: no-repeat;
     background-size: contain;
     border: 1px solid black;
@@ -73,37 +76,10 @@ td {
 
 #pass {
     position: absolute;
-    width: 40px;
+    width: 100px;
     height: 20px;
     top: 1%;
     left: 1%;
-}
-
-#pass p, #pass #passB{
-    display: none;
-}
-
-p {
-    font-size: 70%;
-}
-
-#passB {
-    height:20px;
-    width:40px;
-    font-size: 70%;
-}
-
-#pass:hover {
-    width: 200px;
-    height: 150px;
-}
-
-#pass:hover p, #pass:hover #passB  {
-    display: block;
-}
-
-#pass:hover .ph {
-    display: none;
 }
 
 

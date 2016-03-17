@@ -1,4 +1,4 @@
-interface SupportedLanguages { en: string, iw: string};
+interface SupportedLanguages { en: string, es: string};
 interface Translations {
   [index: string]: SupportedLanguages;
 }
@@ -13,6 +13,7 @@ module game {
   export let move: IMove = null;
   export let state: IState = null;
   export let isHelpModalShown: boolean = false;
+  export let boardSize = 13;
 
   export function init() {
     translate.setTranslations(getTranslations());
@@ -76,23 +77,27 @@ module game {
     return {
       RULES_OF_TICTACTOE: {
         en: "Rules of Go",
-        iw: "חוקי המשחק",
+        es: "חוקי המשחק",
       },
       RULES_SLIDE1: {
         en: "Black makes the first move, after which White and Black alternate. You can only place one stone per turn. A player can pass their turn at any time.",
-        iw: "אתה והיריב מסמנים איקס או עיגול כל תור",
+        es: "Negro juega primero; después ambos jugadores juegan alternadamente. Solamente se permite poner una piedra por turno. Un jugador puede pasar su turno en cualquier momento."
       },
       RULES_SLIDE2: {
         en: "A stone or solidly connected group of stones of one color is captured and removed from the board when all the intersections directly adjacent to it are occupied by the enemy.",
-        iw: "הראשון שמסמן שורה, עמודה או אלכסון מנצח",
+        es: "Una piedra o un grupo de piedras connectadas de un color son capturadas y removidas del tabero cuando todas as intersecciones directamente adjacentes son ocupadas por piedras enemigas."
       },
       RULES_SLIDE3: {
-        en: "No stone may be played so as to recreate a former board state. Two consecutive passes end the game. ",
-        iw: "",
+        en: "No stone may be played so as to recreate a former board state. Two consecutive passes end the game.",
+        es: "Ninguna piedra puede ser jugada de tal manera que repita un previo tablero. Cuando los dos jugadores pasan su turno el juego termina.",
+      },
+      RULES_SLIDE4: {
+        en: "A player's territory consists of all the points the player has either occupied or surrounded. The player with more territory wins the game.",
+        es: "El territorio de un jugador consiste en todos los puntos que esten ocupados o rodeados. El jugador con más territorio gana el juego.",          
       },
       CLOSE:  {
         en: "Close",
-        iw: "סגור",
+        es: "Cerrar"
       },
     };
   }
@@ -182,6 +187,19 @@ module game {
       }
   }
   
+  export function setBoardSize(num: number): void {
+      if (num !== 13 && num !== 19 && num !== 9) {
+          throw Error("Invalid board size");
+      }
+      gameLogic.ROWS = num;
+      gameLogic.COLS = num;
+      state = gameLogic.getInitialState();
+      boardSize = num;
+      document.getElementById("boardSize").style.display = "none";
+      document.getElementById("container").style.display = "block";
+      return
+  }
+    
   export function resign(player : string): void {
     // if row == -1 and col == 0 then black resigned
     // if row == 0 and col == -1 then white resigned
@@ -194,6 +212,12 @@ module game {
     
   }
   
+  export function restartGame(): void {
+      init();
+      document.getElementById("boardSize").style.display = "block";
+      document.getElementById("container").style.display = "none";
+      return
+  }
 
   export function isPieceWhite(row: number, col: number): boolean {
     return state.board[row][col] === gameLogic.WHITE;
