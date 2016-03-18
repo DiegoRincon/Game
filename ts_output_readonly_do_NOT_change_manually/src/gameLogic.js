@@ -43,7 +43,7 @@ var gameLogic;
         newBoard[row][col] = (oppColor == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
         var oppStones = (oppColor == gameLogic.WHITE) ? stateBeforeMove.whiteStones : stateBeforeMove.blackStones;
         var trappedStones = getTrapped(newBoard, oppColor, oppStones);
-        if (trappedStones.length >= 0) {
+        if (trappedStones.length > 0) {
             return false;
         }
         for (var i = -1; i < 2; i++) {

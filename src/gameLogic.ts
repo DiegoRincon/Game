@@ -67,7 +67,7 @@ module gameLogic {
       
       let oppStones = (oppColor == WHITE) ? stateBeforeMove.whiteStones : stateBeforeMove.blackStones;
       let trappedStones: Stone[] = getTrapped(newBoard, oppColor, oppStones);
-      if (trappedStones.length >= 0) {
+      if (trappedStones.length > 0) {
           return false;
       }
             
