@@ -23,7 +23,9 @@ var gameLogic;
     function getInitialState() {
         var whiteStones = [];
         var blackStones = [];
-        return { board: getInitialBoard(), delta: null, hasPassed: false, whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones };
+        var initialBoard = getInitialBoard();
+        return { board: initialBoard, delta: null, hasPassed: false,
+            whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones, previousBoard: initialBoard };
     }
     gameLogic.getInitialState = getInitialState;
     function isTie(board) {
@@ -120,10 +122,19 @@ var gameLogic;
         // At this point everything looks good, compute scores and move on
         var boardAfterMove = angular.copy(board);
         boardAfterMove[row][col] = turnIndexBeforeMove;
+        // if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
+        //     throw Error("Cannot go back to a previous board!")
+        // }
         var delta = { row: row, col: col };
         return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta, -1);
     }
     gameLogic.createMove = createMove;
+    function checkKoRule(boardAfter, boardBefore) {
+        if (angular.equals(boardAfter, boardBefore)) {
+            return false;
+        }
+        return true;
+    }
     function removeTrappedStonesBoard(trappedStones, board) {
         if (!trappedStones) {
             return;
@@ -204,6 +215,9 @@ var gameLogic;
             endMatchScores = null;
             turnIndexAfterMove = (turnIndexBeforeMove == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
         }
+        if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
+            throw Error("Cannot go back to a previous board!");
+        }
         var stateAfterMove = {
             delta: delta,
             board: boardAfterMove,
@@ -211,7 +225,8 @@ var gameLogic;
             whiteScore: newWhiteScore,
             blackScore: newBlackScore,
             whiteStones: newWhiteStones,
-            blackStones: newBlackStones };
+            blackStones: newBlackStones,
+            previousBoard: stateBeforeMove.board };
         return { endMatchScores: endMatchScores, turnIndexAfterMove: turnIndexAfterMove, stateAfterMove: stateAfterMove };
     }
     function getTrapped(board, color, colorStones) {

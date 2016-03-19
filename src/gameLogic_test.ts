@@ -9,12 +9,17 @@ describe("In TicTacToe", function() {
   let NO_ONE_WINS: number[] = null;
 
   it("placing BLACK in 0x0 from initial state is legal", function() {
+      let boardBefore =  [[-1, -1, -1, -1, -1],
+          [-1, -1, -1, -1, -1],
+          [-1, -1, -1, -1, -1],
+          [-1, -1, -1, -1, -1],
+          [-1, -1, -1, -1, -1], ]
       let boardAfter = [[BLACK, -1, -1, -1, -1],
           [-1, -1, -1, -1, -1],
           [-1, -1, -1, -1, -1],
           [-1, -1, -1, -1, -1],
           [-1, -1, -1, -1, -1], ]
-      expectMove(OK, BLACK, null, null, 0, 0, boardAfter, false, [], [{ row: 0, col: 0 }], 0, 0, WHITE, null);
+      expectMove(OK, BLACK, null, null, 0, 0, boardAfter, false, [], [{ row: 0, col: 0 }], 0, 0, WHITE, null, boardBefore);
   });
 
   it("placing WHITE in taken position is illegal", function() {
@@ -25,19 +30,21 @@ describe("In TicTacToe", function() {
             [-1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],];
         let whiteStones: Stone[] = [];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 0, col: 0 },
                     hasPassed: false,
                     whiteStones: whiteStones,
                     blackStones: [{ row: 0, col: 0 }],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard};
         let boardAfter = [[BLACK, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1],];
-        expectMove(ILLEGAL, WHITE, boardBefore, stateBeforeMove, 0, 0, boardAfter, false, [], [{ row: 0, col: 0 }], 0, 0, WHITE, null);
+        expectMove(ILLEGAL, WHITE, boardBefore, stateBeforeMove, 0, 0, boardAfter, false, [], [{ row: 0, col: 0 }], 0, 0, WHITE, null, boardBefore);
     });
   it("Trapping WHITE stones work", function() {
       let boardBefore = [[BLACK, WHITE, -1, -1, -1],
@@ -45,20 +52,22 @@ describe("In TicTacToe", function() {
                         [WHITE, BLACK, -1, -1, -1],
                         [WHITE, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 0, col: 0 },
                     hasPassed: false,
                     whiteStones: [{row:0,col:1},{row:1,col:0}, {row:2,col:0}],
                     blackStones: [{row:0,col:0}, {row:1,col:1}, {row:2,col:1}, {row:3,col:1}],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard};
         let boardAfter = [[BLACK, WHITE, -1, -1, -1],
                          [-1, BLACK, -1, -1, -1],
                          [-1, BLACK, -1, -1, -1],
                          [-1, BLACK, -1, -1, -1],
                          [BLACK, -1, -1, -1, -1],];
         expectMove(OK, BLACK, boardBefore, stateBeforeMove, 4, 0, boardAfter, false,
-        [{row:0,col:1}], [{row:0,col:0}, {row:1,col:1}, {row:2,col:1}, {row:3,col:1}, {row:4,col:0}], 0, 3, WHITE, null);
+        [{row:0,col:1}], [{row:0,col:0}, {row:1,col:1}, {row:2,col:1}, {row:3,col:1}, {row:4,col:0}], 0, 3, WHITE, null, boardBefore);
     });
     
   it("Trapping BLACK stones work", function() {
@@ -67,20 +76,22 @@ describe("In TicTacToe", function() {
                         [BLACK, WHITE, -1, -1, -1],
                         [-1, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 3, col: 1 },
                     hasPassed: false,
                     blackStones: [{row:0,col:0},{row:1,col:0}, {row:2,col:0}, {row:3,col:1}],
                     whiteStones: [{row:0,col:1}, {row:1,col:1}, {row:2,col:1}],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard };
         let boardAfter = [[-1, WHITE, -1, -1, -1],
                         [-1, WHITE, -1, -1, -1],
                         [-1, WHITE, -1, -1, -1],
                         [WHITE, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, 3, 0, boardAfter, false,
-            [{row:0,col:1}, {row:1,col:1}, {row:2,col:1}, {row:3,col:0}], [{row:3,col:1}], 3, 0, BLACK, null);
+            [{row:0,col:1}, {row:1,col:1}, {row:2,col:1}, {row:3,col:0}], [{row:3,col:1}], 3, 0, BLACK, null, boardBefore);
     });
     
   it("Recognizes row:-1, col:-1 as a pass", function() {
@@ -89,8 +100,9 @@ describe("In TicTacToe", function() {
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1]];
+        let previousBoard: Board = [];
         expectMove(OK, BLACK, null, null, -1, -1, boardAfter, true,
-            [], [], 0, 0, WHITE, null);
+            [], [], 0, 0, WHITE, null, boardAfter);
     });
     
   it("Not allowing suicide moves", function() {
@@ -99,20 +111,22 @@ describe("In TicTacToe", function() {
                         [-1, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 1, col: 1 },
                     hasPassed: false,
                     blackStones: [{row:1,col:1},{row:2,col:1}],
                     whiteStones: [{row:0,col:1}, {row:1,col:0}],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard };
         let boardAfter= [[-1, WHITE, -1, -1, -1],
                         [WHITE, BLACK, -1, -1, -1],
                         [-1, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
         expectMove(ILLEGAL, BLACK, boardBefore, stateBeforeMove, 0, 0, boardAfter, false,
-            [{row:0,col:1}, {row:1,col:0}], [{row:1,col:1},{row:2,col:1}], 0, 0, BLACK, null);
+            [{row:0,col:1}, {row:1,col:0}], [{row:1,col:1},{row:2,col:1}], 0, 0, BLACK, null, boardBefore);
     });
     
   it("Outputs correct end game scores", function() {
@@ -121,20 +135,22 @@ describe("In TicTacToe", function() {
                         [-1, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: -1, col: -1 },
                     hasPassed: true,
                     blackStones: [{row:1,col:1}, {row:2,col:1}],
                     whiteStones: [{row:0,col:1}, {row:1,col:0}],
                     whiteScore: 4,
-                    blackScore: 8 };
+                    blackScore: 8,
+                    previousBoard: previousBoard };
         let boardAfter= [[gameLogic.WHITETERR, WHITE, -1, -1, -1],
                         [WHITE, BLACK, -1, -1, -1],
                         [-1, BLACK, -1, -1, -1],
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, -1, -1, boardAfter, true,
-            [{row:0,col:1}, {row:1,col:0}], [{row:1,col:1},{row:2,col:1}], 4, 8, -1, [2,9.5]);
+            [{row:0,col:1}, {row:1,col:0}], [{row:1,col:1},{row:2,col:1}], 4, 8, -1, [2,9.5], boardBefore);
     });
     
   it("Trapping BLACK stones work 2", function() {
@@ -143,20 +159,23 @@ describe("In TicTacToe", function() {
                         [WHITE, BLACK, WHITE, BLACK, -1],
                         [-1, WHITE, BLACK, -1, -1],
                         [-1, BLACK, -1, -1, -1],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 2, col: 3 },
                     hasPassed: false,
                     blackStones: [{row:0,col:0},{row:1,col:1}, {row:2,col:1}, {row:1,col:3}, {row:3,col:2}, {row:4,col:1}],
                     whiteStones: [{row:3,col:1}, {row:1,col:0}, {row:1,col:2}, {row:2,col:0}, {row:2,col:2}],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard };
         let boardAfter= [[-1, WHITE, -1, -1, -1],
                         [WHITE, -1, WHITE, -1, -1],
                         [WHITE, -1, WHITE, BLACK, -1],
                         [-1, WHITE, BLACK, -1, -1],
                         [-1, BLACK, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, 0, 1, boardAfter, false,
-            [{row:3,col:1}, {row:1,col:0}, {row:1,col:2}, {row:2,col:0}, {row:2,col:2}, {row:0,col:1}], [{row:1,col:3}, {row:3,col:2}, {row:4,col:1}], 3, 0, BLACK, null);
+            [{row:3,col:1}, {row:1,col:0}, {row:1,col:2}, {row:2,col:0}, {row:2,col:2}, {row:0,col:1}],
+             [{row:1,col:3}, {row:3,col:2}, {row:4,col:1}], 3, 0, BLACK, null, boardBefore);
     });
     
   it("Trapping WHITE stones work 2", function() {
@@ -165,20 +184,24 @@ describe("In TicTacToe", function() {
                         [-1, WHITE, BLACK, WHITE, BLACK],
                         [-1, -1, BLACK, WHITE, BLACK],
                         [-1, -1, -1, -1, WHITE],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 2, col: 3 },
                     hasPassed: false,
                     blackStones: [{row:1,col:1},{row:1,col:3}, {row:2,col:2}, {row:2,col:4}, {row:3,col:2}, {row:3,col:4}],
                     whiteStones: [{row:0,col:3}, {row:1,col:2}, {row:2,col:1}, {row:2,col:3}, {row:3,col:3}, {row:4,col:4}],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard };
         let boardAfter= [[-1, -1, -1, WHITE, -1],
                         [-1, BLACK, WHITE, BLACK, -1],
                         [-1, WHITE, BLACK, -1, BLACK],
                         [-1, -1, BLACK, -1, BLACK],
                         [-1, -1, -1, BLACK, -1],];
         expectMove(OK, BLACK, boardBefore, stateBeforeMove, 4, 3, boardAfter, false,
-            [{row:0,col:3}, {row:1,col:2}, {row:2,col:1}], [{row:1,col:1},{row:1,col:3}, {row:2,col:2}, {row:2,col:4}, {row:3,col:2}, {row:3,col:4}, {row:4,col:3}], 0, 3, WHITE, null);
+            [{row:0,col:3}, {row:1,col:2}, {row:2,col:1}],
+             [{row:1,col:1},{row:1,col:3}, {row:2,col:2}, {row:2,col:4}, {row:3,col:2}, {row:3,col:4}, {row:4,col:3}],
+              0, 3, WHITE, null, boardBefore);
     });
     
     it("Trapping BLACK stones work 3", function() {
@@ -187,20 +210,22 @@ describe("In TicTacToe", function() {
                         [WHITE, BLACK, WHITE, -1, -1],
                         [-1, WHITE, BLACK, BLACK, -1],
                         [BLACK, -1, -1, -1, -1],];
+        let previousBoard: Board = [];
         let stateBeforeMove = { board: boardBefore,
                     delta: { row: 3, col: 3 },
                     hasPassed: false,
                     blackStones: [{row:2,col:1},{row:4,col:0}, {row:3,col:2}, {row:3,col:3}],
                     whiteStones: [{row:2,col:0}, {row:2,col:2}, {row:3,col:1}],
                     whiteScore: 0,
-                    blackScore: 0 };
+                    blackScore: 0,
+                    previousBoard: previousBoard };
         let boardAfter= [[-1, -1, -1, -1, -1],
                         [-1, WHITE, -1, -1, -1],
                         [WHITE, -1, WHITE, -1, -1],
                         [-1, WHITE, BLACK, BLACK, -1],
                         [BLACK, -1, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, 1, 1, boardAfter, false,
-            [{row:2,col:0}, {row:2,col:2}, {row:3,col:1}, {row:1,col:1}], [{row:4,col:0}, {row:3,col:2}, {row:3,col:3}], 1, 0, BLACK, null);
+            [{row:2,col:0}, {row:2,col:2}, {row:3,col:1}, {row:1,col:1}], [{row:4,col:0}, {row:3,col:2}, {row:3,col:3}], 1, 0, BLACK, null, boardBefore);
     });
     
   function expectMove(
@@ -217,7 +242,8 @@ describe("In TicTacToe", function() {
       whiteScore: number,
       blackScore: number,
       turnIndexAfterMove: number,
-      endMatchScores: number[]): void {
+      endMatchScores: number[],
+      previousBoard: Board): void {
           
     let stateTransition: IStateTransition = {
       turnIndexBeforeMove: turnIndexBeforeMove,
@@ -232,7 +258,8 @@ describe("In TicTacToe", function() {
             whiteScore: whiteScore,
             blackScore: blackScore,
             whiteStones: whiteStones,
-            blackStones: blackStones }
+            blackStones: blackStones,
+            previousBoard: previousBoard }
       },
       numberOfPlayers: null
     };

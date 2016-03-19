@@ -15,6 +15,7 @@ interface IState {
   hasPassed: Boolean;
   whiteStones: Stone[];
   blackStones: Stone[];
+  previousBoard: Board;
   whiteScore: number;
   blackScore: number;
 }
@@ -45,7 +46,9 @@ module gameLogic {
   export function getInitialState(): IState {
       let whiteStones: Stone[] = [];
       let blackStones: Stone[] = [];
-      return { board: getInitialBoard(), delta: null, hasPassed: false, whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones };
+      let initialBoard = getInitialBoard();
+      return { board: initialBoard, delta: null, hasPassed: false,
+           whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones, previousBoard: initialBoard};
   }
 
   function isTie(board: Board): boolean {
@@ -154,8 +157,18 @@ module gameLogic {
     
     let boardAfterMove = angular.copy(board);
     boardAfterMove[row][col] = turnIndexBeforeMove;
+    // if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
+    //     throw Error("Cannot go back to a previous board!")
+    // }
     let delta: BoardDelta = {row: row, col: col};
     return endOfTurnMove(boardAfterMove, gameEnded, turnIndexBeforeMove, stateBeforeMove, delta, -1);
+  }
+  
+  function checkKoRule(boardAfter: Board, boardBefore: Board): boolean {
+      if (angular.equals(boardAfter, boardBefore)) {
+          return false;
+      }
+      return true;
   }
   
   function removeTrappedStonesBoard(trappedStones: Stone[], board: Board): void {
@@ -238,6 +251,9 @@ module gameLogic {
           endMatchScores = null;
           turnIndexAfterMove = (turnIndexBeforeMove == WHITE) ? BLACK : WHITE;
       }
+      if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
+        throw Error("Cannot go back to a previous board!")
+      }
       let stateAfterMove: IState = {
           delta: delta,
           board: boardAfterMove,
@@ -245,7 +261,8 @@ module gameLogic {
           whiteScore: newWhiteScore,
           blackScore: newBlackScore,
           whiteStones: newWhiteStones,
-          blackStones: newBlackStones };
+          blackStones: newBlackStones,
+          previousBoard: stateBeforeMove.board};
       return {endMatchScores: endMatchScores, turnIndexAfterMove: turnIndexAfterMove, stateAfterMove: stateAfterMove};
   }
 
