@@ -206,6 +206,35 @@ describe("In TicTacToe", function () {
             [BLACK, -1, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, 1, 1, boardAfter, false, [{ row: 2, col: 0 }, { row: 2, col: 2 }, { row: 3, col: 1 }, { row: 1, col: 1 }], [{ row: 4, col: 0 }, { row: 3, col: 2 }, { row: 3, col: 3 }], 1, 0, BLACK, null, boardBefore);
     });
+    it("Testing ko rule works", function () {
+        var boardBefore = [
+            [BLACK, -1, -1, -1, -1],
+            [-1, BLACK, -1, -1, -1],
+            [BLACK, WHITE, BLACK, -1, -1],
+            [WHITE, -1, WHITE, -1, -1],
+            [-1, WHITE, -1, -1, -1],];
+        var previousBoard = [
+            [BLACK, -1, -1, -1, -1],
+            [-1, BLACK, -1, -1, -1],
+            [BLACK, -1, BLACK, -1, -1],
+            [WHITE, BLACK, WHITE, -1, -1],
+            [-1, WHITE, -1, -1, -1],];
+        var boardAfter = [
+            [BLACK, -1, -1, -1, -1],
+            [-1, BLACK, -1, -1, -1],
+            [BLACK, WHITE, BLACK, -1, -1],
+            [WHITE, -1, WHITE, -1, -1],
+            [-1, WHITE, -1, -1, -1],];
+        var stateBeforeMove = { board: boardBefore,
+            delta: { row: 2, col: 1 },
+            hasPassed: false,
+            blackStones: [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 0 }, { row: 2, col: 2 }],
+            whiteStones: [{ row: 2, col: 1 }, { row: 3, col: 0 }, { row: 3, col: 2 }, { row: 4, col: 1 }],
+            whiteScore: 0,
+            blackScore: 0,
+            previousBoard: previousBoard };
+        expectMove(ILLEGAL, BLACK, boardBefore, stateBeforeMove, 3, 1, boardAfter, false, [{ row: 2, col: 1 }, { row: 3, col: 0 }, { row: 3, col: 2 }, { row: 4, col: 1 }], [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 0 }, { row: 2, col: 2 }], 0, 0, BLACK, null, previousBoard);
+    });
     function expectMove(isOk, turnIndexBeforeMove, boardBeforeMove, stateBeforeMove, row, col, boardAfterMove, hasPassed, whiteStones, blackStones, whiteScore, blackScore, turnIndexAfterMove, endMatchScores, previousBoard) {
         var stateTransition = {
             turnIndexBeforeMove: turnIndexBeforeMove,

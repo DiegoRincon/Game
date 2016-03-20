@@ -130,6 +130,9 @@ var gameLogic;
     }
     gameLogic.createMove = createMove;
     function checkKoRule(boardAfter, boardBefore) {
+        if (boardAfter === null || boardBefore === null) {
+            return true;
+        }
         if (angular.equals(boardAfter, boardBefore)) {
             return false;
         }
@@ -186,7 +189,12 @@ var gameLogic;
             //newBlackScore = getBlackTerritory(boardAfterMove, newBlackStones.length);
             newBlackScore = stateBeforeMove.blackScore + newStones;
         }
-        if (hasPassed) {
+        if (!hasPassed) {
+            if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
+                throw Error("Cannot go back to a previous board!");
+            }
+        }
+        else {
             newWhiteScore = stateBeforeMove.whiteScore;
             newBlackScore = stateBeforeMove.blackScore;
         }
@@ -214,9 +222,6 @@ var gameLogic;
         else {
             endMatchScores = null;
             turnIndexAfterMove = (turnIndexBeforeMove == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
-        }
-        if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
-            throw Error("Cannot go back to a previous board!");
         }
         var stateAfterMove = {
             delta: delta,

@@ -165,6 +165,9 @@ module gameLogic {
   }
   
   function checkKoRule(boardAfter: Board, boardBefore: Board): boolean {
+      if (boardAfter === null || boardBefore === null) {
+          return true;
+      }
       if (angular.equals(boardAfter, boardBefore)) {
           return false;
       }
@@ -225,7 +228,11 @@ module gameLogic {
           //newBlackScore = getBlackTerritory(boardAfterMove, newBlackStones.length);
           newBlackScore = stateBeforeMove.blackScore + newStones;
       }
-      if (hasPassed) {
+      if (!hasPassed) {
+          if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
+              throw Error("Cannot go back to a previous board!")
+          }
+      } else {
           newWhiteScore = stateBeforeMove.whiteScore;
           newBlackScore = stateBeforeMove.blackScore;
       }
@@ -250,9 +257,6 @@ module gameLogic {
       } else {
           endMatchScores = null;
           turnIndexAfterMove = (turnIndexBeforeMove == WHITE) ? BLACK : WHITE;
-      }
-      if (!checkKoRule(boardAfterMove, stateBeforeMove.previousBoard)) {
-        throw Error("Cannot go back to a previous board!")
       }
       let stateAfterMove: IState = {
           delta: delta,
