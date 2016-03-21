@@ -1,4 +1,4 @@
-describe("In TicTacToe", function() {
+describe("In Go", function() {
   let OK = true;
   let ILLEGAL = false;
   let WHITE = gameLogic.WHITE;

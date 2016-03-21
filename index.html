@@ -127,9 +127,9 @@
 </div>
 <div id="gameArea">
   <div id="boardSize">
-          <input type="submit" value="Play 9x9" ng-click="game.setBoardSize(9)" />
-          <input type="submit" value="Play 13x13" ng-click="game.setBoardSize(13)" />
-          <input type="submit" value="Play 19x19" ng-click="game.setBoardSize(19)" />
+          <input id="9x9" type="submit" value="Play 9x9" ng-click="game.setBoardSize(9)" />
+          <input id="13x13" type="submit" value="Play 13x13" ng-click="game.setBoardSize(13)" />
+          <input id="19x19" type="submit" value="Play 19x19" ng-click="game.setBoardSize(19)" />
   </div>
   <div id="container" class="{{'container'+game.boardSize}}">
     <div ng-repeat="row in game.getNumber(game.boardSize) track by $index"
@@ -138,17 +138,22 @@
         <div ng-repeat="col in game.getNumber(game.boardSize) track by $index"
         ng-class="game.getTurn()"
         ng-click="game.cellClicked(row, col)"
+        id=" {{'e2e_test_div_' + row + 'x' + col}}"
         style="position:absolute; top:0; left:{{col*100}}%; width:100%; height:100%;" >
             <div style="width:100%; height:100%"
             ng-if="game.shouldShowImage(row,col)">
                 <img alt="whiteStone" ng-if="game.isPieceWhite(row,col)"
-                src="css/whiteStone.svg" style="width:100%; height:100%" />
+                src="imgs/whiteStone.svg" style="width:100%; height:100%"
+                id="{{'e2e_test_pieceWhite_' + row + 'x' + col}}" />
                 <img alt="blackStone" ng-if="game.isPieceBlack(row,col)"
-                src="css/blackStone.svg" style="width:100%; height:100%" />
+                src="imgs/blackStone.svg" style="width:100%; height:100%"
+                id="{{'e2e_test_pieceBlack_' + row + 'x' + col}}" />
                 <img alt="whiteTerr" ng-if="game.isPieceWhiteTerritory(row,col)"
-                src="css/whiteTerr.svg" style="width:100%; height:100%" />
+                src="imgs/whiteTerr.svg" style="width:100%; height:100%"
+                id="{{'e2e_test_pieceWhiteTerr_' + row + 'x' + col}}"  />
                 <img alt="blackTerr" ng-if="game.isPieceBlackTerritory(row,col)"
-                src="css/blackTerr.svg" style="width:100%; height:100%" />
+                src="imgs/blackTerr.svg" style="width:100%; height:100%"
+                id="{{'e2e_test_pieceBlackTerr_' + row + 'x' + col}}"  />
             </div>
         </div>
     </div>

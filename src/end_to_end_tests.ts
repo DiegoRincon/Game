@@ -1,6 +1,7 @@
 // This file has end-to-end tests using protractor, see:
 // https://github.com/angular/protractor/blob/master/docs/toc.md 
 declare var require: (module: string) => any;
+
 function expectEmptyBrowserLogs() {
   browser.manage().logs().get('browser').then(function(browserLog) {
     // See if there are any errors (warnings are ok)
@@ -48,15 +49,19 @@ module JasmineOverrides {
   });
 }
 
-describe('TicTacToe', function() {
+describe('Go', function() {
+  let gameLogic = require('./gameLogic.js');
   browser.driver.manage().window().setSize(400, 600);
   browser.driver.manage().window().setPosition(10, 10);
+  let BLACK = gameLogic.BLACK;
+  let WHITE = gameLogic.WHITE;
   
   let checkNoErrorInLogsIntervalId: number = null;
   beforeEach(()=>{
     console.log('\n\n\nRunning test: ', lastTest.fullName);
     checkNoErrorInLogsIntervalId = setInterval(expectEmptyBrowserLogs, 100);
     getPage('');
+    element(by.id('9x9')).click();    
   });
   afterEach(()=>{
     expectEmptyBrowserLogs();
@@ -80,9 +85,11 @@ describe('TicTacToe', function() {
     }
   }
 
-  function expectPiece(row: number, col: number, expectedPieceKind: string) {
-    expectPieceKindDisplayed(row, col, 'X', expectedPieceKind === "X");
-    expectPieceKindDisplayed(row, col, 'O', expectedPieceKind === "O");
+  function expectPiece(row: number, col: number, expectedPieceKind: number) {
+    expectPieceKindDisplayed(row, col, 'White', expectedPieceKind === gameLogic.WHITE);
+    expectPieceKindDisplayed(row, col, 'Black', expectedPieceKind === gameLogic.BLACK);
+    expectPieceKindDisplayed(row, col, 'BlackTerr', expectedPieceKind === gameLogic.BLACKTERR);
+    expectPieceKindDisplayed(row, col, 'WhiteTerr', expectedPieceKind === gameLogic.WHITETERR);
   }
 
   function expectBoard(board: Board) {
@@ -95,78 +102,121 @@ describe('TicTacToe', function() {
     }
   }
 
-  function clickDivAndExpectPiece(row: number, col: number, expectedPieceKind: string): void {
+  function clickDivAndExpectPiece(row: number, col: number, expectedPieceKind: number): void {
     element(by.id('e2e_test_div_' + row + 'x' + col)).click();
     expectPiece(row, col, expectedPieceKind);
   }
 
   it('should have a title', function () {
-    expect(browser.getTitle()).toEqual('TicTacToe');
+    expect(browser.getTitle()).toEqual('Go');
   });
 
   it('should have an empty TicTacToe board', function () {
     expectBoard(
-        [['', '', ''],
-         ['', '', ''],
-         ['', '', '']]);
+        [[-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],]);
+        
   });
 
-  it('should show X if I click in 0x0', function () {
-    clickDivAndExpectPiece(0, 0, "X");
+  it('should show Black if I click in 0x0', function () {
+    clickDivAndExpectPiece(0, 0, BLACK);
     expectBoard(
-        [['X', '', ''],
-         ['', '', ''],
-         ['', '', '']]);
+        [[BLACK, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],]);
   });
 
-  it('should ignore clicking on a non-empty cell', function () {
-    clickDivAndExpectPiece(0, 0, "X");
-    clickDivAndExpectPiece(0, 0, "X"); // clicking on a non-empty cell doesn't do anything.
-    clickDivAndExpectPiece(1, 1, "O");
-    expectBoard(
-        [['X', '', ''],
-         ['', 'O', ''],
-         ['', '', '']]);
-  });
+//   it('should ignore clicking on a non-empty cell', function () {
+//     clickDivAndExpectPiece(0, 0, BLACK);
+//     clickDivAndExpectPiece(0, 0, BLACK); // clicking on a non-empty cell doesn't do anything.
+//     clickDivAndExpectPiece(1, 1, WHITE);
+//     expectBoard(
+//          [[BLACK, -1, -1, -1, -1],
+//           [-1, WHITE, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1], ]);
+//   });
+  
+//   it('piece should disappear if surrounded', function() {
+//     clickDivAndExpectPiece(0, 0, BLACK);
+//     clickDivAndExpectPiece(1, 0, WHITE);
+//     clickDivAndExpectPiece(1, 1, BLACK);
+//     clickDivAndExpectPiece(0, 1, WHITE);
+//     expectBoard(
+//          [[-1, WHITE, -1, -1, -1],
+//           [WHITE, BLACK, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1], ]);
+//   });
+  
+//   it('pass button should work', function() {
+//     clickDivAndExpectPiece(0, 0, BLACK);
+//     element(by.id('passB')).click();
+//     clickDivAndExpectPiece(1, 0, BLACK);
+//     clickDivAndExpectPiece(0, 1, WHITE);
+//     element(by.id('passB')).click();
+//     clickDivAndExpectPiece(1, 1, WHITE);
+//     expectBoard(
+//          [[BLACK, WHITE, -1, -1, -1],
+//           [BLACK, WHITE, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1], ]);    
+//   });
+  
+//   it('resign button should end game', function() {
+//     clickDivAndExpectPiece(0, 0, BLACK);
+//     clickDivAndExpectPiece(1, 0, WHITE);
+//     clickDivAndExpectPiece(1, 1, BLACK);
+//     clickDivAndExpectPiece(0, 1, WHITE);
+//     expectBoard(
+//          [[-1, WHITE, -1, -1, -1],
+//           [WHITE, BLACK, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1], ]);
+//     element(by.id('resign')).click();
+//     expectBoard(
+//          [[gameLogic.WHITETERR, WHITE, -1, -1, -1],
+//           [WHITE, BLACK, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1], ]);
+//     //this should not have any effect
+//     clickDivAndExpectPiece(2, 1, WHITE);
+//     expectBoard(
+//          [[gameLogic.WHITETERR, WHITE, -1, -1, -1],
+//           [WHITE, BLACK, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1],
+//           [-1, -1, -1, -1, -1], ]);      
+//   });
 
-  it('should end game if X wins', function () {
-    for (let col = 0; col < 3; col++) {
-      clickDivAndExpectPiece(1, col, "X");
-      // After the game ends, player "O" click (in cell 2x2) will be ignored.
-      clickDivAndExpectPiece(2, col, col === 2 ? "" : "O");
-    }
-    expectBoard(
-        [['', '', ''],
-         ['X', 'X', 'X'],
-         ['O', 'O', '']]);
-  });
+//   it('with playAgainstTheComputer should work', function () {
+//     getPage('playAgainstTheComputer');
+//     clickDivAndExpectPiece(1, 0, "X");
+//     browser.sleep(2000); // wait for AI to make at least one move
+//     expectPiece(0, 0, 'O');
+//   });
 
-  it('should end the game in tie', function () {
-    clickDivAndExpectPiece(0, 0, "X");
-    clickDivAndExpectPiece(1, 0, "O");
-    clickDivAndExpectPiece(0, 1, "X");
-    clickDivAndExpectPiece(1, 1, "O");
-    clickDivAndExpectPiece(1, 2, "X");
-    clickDivAndExpectPiece(0, 2, "O");
-    clickDivAndExpectPiece(2, 0, "X");
-    clickDivAndExpectPiece(2, 1, "O");
-    clickDivAndExpectPiece(2, 2, "X");
-    expectBoard(
-        [['X', 'X', 'O'],
-         ['O', 'O', 'X'],
-         ['X', 'O', 'X']]);
-  });
-
-  it('with playAgainstTheComputer should work', function () {
-    getPage('playAgainstTheComputer');
-    clickDivAndExpectPiece(1, 0, "X");
-    browser.sleep(2000); // wait for AI to make at least one move
-    expectPiece(0, 0, 'O');
-  });
-
-  it('with onlyAIs should work', function () {
-    getPage('onlyAIs');
-    browser.sleep(2000); // wait for AI to make at least one move
-    expectPiece(0, 0, 'X');
-  });
+//   it('with onlyAIs should work', function () {
+//     getPage('onlyAIs');
+//     browser.sleep(2000); // wait for AI to make at least one move
+//     expectPiece(0, 0, 'X');
+//   });
 });
