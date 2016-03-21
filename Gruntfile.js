@@ -191,7 +191,7 @@ module.exports = function(grunt) {
             'imgs/Go_9x9.png',
             'imgs/inner.svg',
             'imgs/ko.png',
-            'imgs/scoring/png',
+            'imgs/scoring.png',
             'imgs/whiteStone.svg',
             'imgs/whiteTerr.svg',            
           ],
