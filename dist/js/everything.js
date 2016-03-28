@@ -28,18 +28,6 @@ var gameLogic;
             whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones, previousBoard: initialBoard };
     }
     gameLogic.getInitialState = getInitialState;
-    function isTie(board) {
-        for (var i = 0; i < gameLogic.ROWS; i++) {
-            for (var j = 0; j < gameLogic.COLS; j++) {
-                if (board[i][j] === -1) {
-                    // If there is an empty cell then we do not have a tie.
-                    return false;
-                }
-            }
-        }
-        // No empty cells, so we have a tie!
-        return true;
-    }
     function isSuicide(board, row, col, oppColor, stateBeforeMove) {
         var newBoard = angular.copy(board);
         newBoard[row][col] = (oppColor == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
@@ -83,6 +71,7 @@ var gameLogic;
         }
         return true;
     }
+    gameLogic.isLegalMove = isLegalMove;
     /**
      * Returns the move that should be performed when player
      * with index turnIndexBeforeMove makes a move in cell row X col.
@@ -450,7 +439,7 @@ var game;
     function init() {
         translate.setTranslations(getTranslations());
         translate.setLanguage('en');
-        log.log("Translation of 'RULES_OF_TICTACTOE' is " + translate('RULES_OF_TICTACTOE'));
+        log.log("Translation of 'RULES_OF_GO' is " + translate('RULES_OF_GO'));
         resizeGameAreaService.setWidthToHeight(1);
         moveService.setGame({
             minNumberOfPlayers: 2,
@@ -462,6 +451,7 @@ var game;
         document.addEventListener("animationend", animationEndedCallback, false); // standard
         document.addEventListener("webkitAnimationEnd", animationEndedCallback, false); // WebKit
         document.addEventListener("oanimationend", animationEndedCallback, false); // Opera
+        setTimeout(animationEndedCallback, 1000);
         var w = window;
         if (w["HTMLInspector"]) {
             setInterval(function () {
@@ -505,7 +495,7 @@ var game;
     game.getFinalBlackScore = getFinalBlackScore;
     function getTranslations() {
         return {
-            RULES_OF_TICTACTOE: {
+            RULES_OF_GO: {
                 en: "Rules of Go",
                 es: "חוקי המשחק",
             },
@@ -532,6 +522,8 @@ var game;
         };
     }
     function animationEndedCallback() {
+        if (game.animationEnded)
+            return;
         $rootScope.$apply(function () {
             log.info("Animation ended");
             game.animationEnded = true;
@@ -543,7 +535,23 @@ var game;
             return;
         }
         game.isComputerTurn = false; // to make sure the computer can only move once.
-        moveService.makeMove(aiService.findComputerMove(game.move));
+        var stone = aiService.randomMove(game.move.stateAfterMove.board);
+        var validMove = confirmMove(stone);
+        while (!validMove) {
+            stone = aiService.randomMove(game.move.stateAfterMove.board);
+            validMove = confirmMove(stone);
+        }
+        moveService.makeMove(validMove);
+        // moveService.makeMove(aiService.findComputerMove(move));
+    }
+    function confirmMove(stone) {
+        try {
+            var nextMove = gameLogic.createMove(game.state, stone.row, stone.col, game.move.turnIndexAfterMove);
+            return nextMove;
+        }
+        catch (e) {
+            return null;
+        }
     }
     function updateUI(params) {
         log.info("Game got updateUI:", params);
@@ -561,13 +569,7 @@ var game;
         if (game.isComputerTurn) {
             // To make sure the player won't click something and send a move instead of the computer sending a move.
             game.canMakeMove = false;
-            // We calculate the AI move only after the animation finishes,
-            // because if we call aiService now
-            // then the animation will be paused until the javascript finishes.
             if (!game.state.delta) {
-                // This is the first move in the match, so
-                // there is not going to be an animation, so
-                // call sendComputerMove() now (can happen in ?onlyAIs mode)
                 sendComputerMove();
             }
         }
@@ -686,11 +688,22 @@ angular.module('myApp', ['ngTouch', 'ui.bootstrap', 'gameServices'])
 ;
 var aiService;
 (function (aiService) {
+    function randomMove(board) {
+        var row = Math.floor(Math.random() * gameLogic.ROWS);
+        var col = Math.floor(Math.random() * gameLogic.COLS);
+        while (board[row][col] !== -1) {
+            row = Math.floor(Math.random() * gameLogic.ROWS);
+            col = Math.floor(Math.random() * gameLogic.COLS);
+        }
+        return { row: row, col: col };
+    }
+    aiService.randomMove = randomMove;
     /** Returns the move that the computer player should do for the given state in move. */
     function findComputerMove(move) {
-        return createComputerMove(move, 
-        // at most 1 second for the AI to choose a move (but might be much quicker)
-        { millisecondsLimit: 1000 });
+        return;
+        // return createComputerMove(move,
+        //     // at most 1 second for the AI to choose a move (but might be much quicker)
+        //     {millisecondsLimit: 1000});
     }
     aiService.findComputerMove = findComputerMove;
     /**

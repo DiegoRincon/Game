@@ -1,9 +1,22 @@
 module aiService {
+    
+  export function randomMove(board: Board): Stone {
+      let row = Math.floor(Math.random()*gameLogic.ROWS);
+      let col = Math.floor(Math.random()*gameLogic.COLS);
+      while (board[row][col] !== -1) {
+        row = Math.floor(Math.random()*gameLogic.ROWS);
+        col = Math.floor(Math.random()*gameLogic.COLS);          
+      }
+      return {row:row, col:col};
+  } 
+  
+    
   /** Returns the move that the computer player should do for the given state in move. */
   export function findComputerMove(move: IMove): IMove {
-    return createComputerMove(move,
-        // at most 1 second for the AI to choose a move (but might be much quicker)
-        {millisecondsLimit: 1000});
+      return 
+    // return createComputerMove(move,
+    //     // at most 1 second for the AI to choose a move (but might be much quicker)
+    //     {millisecondsLimit: 1000});
   }
 
   /**

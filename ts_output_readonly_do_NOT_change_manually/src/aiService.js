@@ -1,10 +1,21 @@
 var aiService;
 (function (aiService) {
+    function randomMove(board) {
+        var row = Math.floor(Math.random() * gameLogic.ROWS);
+        var col = Math.floor(Math.random() * gameLogic.COLS);
+        while (board[row][col] !== -1) {
+            row = Math.floor(Math.random() * gameLogic.ROWS);
+            col = Math.floor(Math.random() * gameLogic.COLS);
+        }
+        return { row: row, col: col };
+    }
+    aiService.randomMove = randomMove;
     /** Returns the move that the computer player should do for the given state in move. */
     function findComputerMove(move) {
-        return createComputerMove(move, 
-        // at most 1 second for the AI to choose a move (but might be much quicker)
-        { millisecondsLimit: 1000 });
+        return;
+        // return createComputerMove(move,
+        //     // at most 1 second for the AI to choose a move (but might be much quicker)
+        //     {millisecondsLimit: 1000});
     }
     aiService.findComputerMove = findComputerMove;
     /**

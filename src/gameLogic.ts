@@ -51,19 +51,7 @@ module gameLogic {
            whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones, previousBoard: initialBoard};
   }
 
-  function isTie(board: Board): boolean {
-    for (let i = 0; i < ROWS; i++) {
-      for (let j = 0; j < COLS; j++) {
-        if (board[i][j] === -1) {
-          // If there is an empty cell then we do not have a tie.
-          return false;
-        }
-      }
-    }
-    // No empty cells, so we have a tie!
-    return true;
-  }
-  
+    
   function isSuicide(board: Board, row: number, col: number, oppColor: number, stateBeforeMove: IState): boolean {
       let newBoard = angular.copy(board);
       newBoard[row][col] = (oppColor == WHITE) ? BLACK : WHITE;
@@ -97,7 +85,7 @@ module gameLogic {
   /**
    * Returns whether the move doesn't break the rules
    */
-  function isLegalMove(
+  export function isLegalMove(
       stateBeforeMove: IState, row: number, col: number, turnIndexBeforeMove: number): boolean {
       let board: Board = stateBeforeMove.board;
       //Check if intersection is empty

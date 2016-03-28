@@ -14,7 +14,7 @@ var game;
     function init() {
         translate.setTranslations(getTranslations());
         translate.setLanguage('en');
-        log.log("Translation of 'RULES_OF_TICTACTOE' is " + translate('RULES_OF_TICTACTOE'));
+        log.log("Translation of 'RULES_OF_GO' is " + translate('RULES_OF_GO'));
         resizeGameAreaService.setWidthToHeight(1);
         moveService.setGame({
             minNumberOfPlayers: 2,
@@ -26,6 +26,7 @@ var game;
         document.addEventListener("animationend", animationEndedCallback, false); // standard
         document.addEventListener("webkitAnimationEnd", animationEndedCallback, false); // WebKit
         document.addEventListener("oanimationend", animationEndedCallback, false); // Opera
+        setTimeout(animationEndedCallback, 1000);
         var w = window;
         if (w["HTMLInspector"]) {
             setInterval(function () {
@@ -69,7 +70,7 @@ var game;
     game.getFinalBlackScore = getFinalBlackScore;
     function getTranslations() {
         return {
-            RULES_OF_TICTACTOE: {
+            RULES_OF_GO: {
                 en: "Rules of Go",
                 es: "חוקי המשחק",
             },
@@ -96,6 +97,8 @@ var game;
         };
     }
     function animationEndedCallback() {
+        if (game.animationEnded)
+            return;
         $rootScope.$apply(function () {
             log.info("Animation ended");
             game.animationEnded = true;
@@ -107,7 +110,23 @@ var game;
             return;
         }
         game.isComputerTurn = false; // to make sure the computer can only move once.
-        moveService.makeMove(aiService.findComputerMove(game.move));
+        var stone = aiService.randomMove(game.move.stateAfterMove.board);
+        var validMove = confirmMove(stone);
+        while (!validMove) {
+            stone = aiService.randomMove(game.move.stateAfterMove.board);
+            validMove = confirmMove(stone);
+        }
+        moveService.makeMove(validMove);
+        // moveService.makeMove(aiService.findComputerMove(move));
+    }
+    function confirmMove(stone) {
+        try {
+            var nextMove = gameLogic.createMove(game.state, stone.row, stone.col, game.move.turnIndexAfterMove);
+            return nextMove;
+        }
+        catch (e) {
+            return null;
+        }
     }
     function updateUI(params) {
         log.info("Game got updateUI:", params);
@@ -125,13 +144,7 @@ var game;
         if (game.isComputerTurn) {
             // To make sure the player won't click something and send a move instead of the computer sending a move.
             game.canMakeMove = false;
-            // We calculate the AI move only after the animation finishes,
-            // because if we call aiService now
-            // then the animation will be paused until the javascript finishes.
             if (!game.state.delta) {
-                // This is the first move in the match, so
-                // there is not going to be an animation, so
-                // call sendComputerMove() now (can happen in ?onlyAIs mode)
                 sendComputerMove();
             }
         }

@@ -28,18 +28,6 @@ var gameLogic;
             whiteScore: 0, blackScore: 0, whiteStones: whiteStones, blackStones: blackStones, previousBoard: initialBoard };
     }
     gameLogic.getInitialState = getInitialState;
-    function isTie(board) {
-        for (var i = 0; i < gameLogic.ROWS; i++) {
-            for (var j = 0; j < gameLogic.COLS; j++) {
-                if (board[i][j] === -1) {
-                    // If there is an empty cell then we do not have a tie.
-                    return false;
-                }
-            }
-        }
-        // No empty cells, so we have a tie!
-        return true;
-    }
     function isSuicide(board, row, col, oppColor, stateBeforeMove) {
         var newBoard = angular.copy(board);
         newBoard[row][col] = (oppColor == gameLogic.WHITE) ? gameLogic.BLACK : gameLogic.WHITE;
@@ -83,6 +71,7 @@ var gameLogic;
         }
         return true;
     }
+    gameLogic.isLegalMove = isLegalMove;
     /**
      * Returns the move that should be performed when player
      * with index turnIndexBeforeMove makes a move in cell row X col.
