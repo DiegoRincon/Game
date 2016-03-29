@@ -14,6 +14,7 @@ module game {
   export let state: IState = null;
   export let isHelpModalShown: boolean = false;
   export let boardSize = 13;
+  export const KOMI = (boardSize === 19) ? 6.5 : (boardSize === 13) ? 7.5 : 8.5;
 
   export function init() {
     translate.setTranslations(getTranslations());
@@ -67,7 +68,7 @@ module game {
   }
   
   export function getFinalWhiteScore(): number {
-      return move.endMatchScores[gameLogic.WHITE];
+      return move.endMatchScores[gameLogic.WHITE] + KOMI;
   }
   
   export function getFinalBlackScore(): number {

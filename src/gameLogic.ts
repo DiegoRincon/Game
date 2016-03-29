@@ -28,7 +28,6 @@ module gameLogic {
   export const WHITE = 1;
   export const BLACKTERR = 2;
   export const WHITETERR = 3;
-  export const KOMI = 6.5;
 
   /** Returns the initial TicTacToe board, which is a ROWSxCOLS matrix containing ''. */
   function getInitialBoard(): Board {
@@ -334,7 +333,7 @@ module gameLogic {
   }
       
   export function getWhiteTerritory(board : Board, numWhiteStones: number) : number {
-      return getTerritory(board, WHITE).length + KOMI + numWhiteStones;
+      return getTerritory(board, WHITE).length + numWhiteStones;
   }
   
   export function getBlackTerritory(board : Board, numBlackStones: number) : number { 

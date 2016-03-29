@@ -7,7 +7,6 @@ var gameLogic;
     gameLogic.WHITE = 1;
     gameLogic.BLACKTERR = 2;
     gameLogic.WHITETERR = 3;
-    gameLogic.KOMI = 6.5;
     /** Returns the initial TicTacToe board, which is a ROWSxCOLS matrix containing ''. */
     function getInitialBoard() {
         var board = [];
@@ -295,7 +294,7 @@ var gameLogic;
         return newBoard;
     }
     function getWhiteTerritory(board, numWhiteStones) {
-        return getTerritory(board, gameLogic.WHITE).length + gameLogic.KOMI + numWhiteStones;
+        return getTerritory(board, gameLogic.WHITE).length + numWhiteStones;
     }
     gameLogic.getWhiteTerritory = getWhiteTerritory;
     function getBlackTerritory(board, numBlackStones) {

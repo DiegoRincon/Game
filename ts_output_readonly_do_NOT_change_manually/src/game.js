@@ -11,6 +11,7 @@ var game;
     game.state = null;
     game.isHelpModalShown = false;
     game.boardSize = 13;
+    game.KOMI = (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
     function init() {
         translate.setTranslations(getTranslations());
         translate.setLanguage('en');
@@ -61,7 +62,7 @@ var game;
     }
     game.isGameOver = isGameOver;
     function getFinalWhiteScore() {
-        return game.move.endMatchScores[gameLogic.WHITE];
+        return game.move.endMatchScores[gameLogic.WHITE] + game.KOMI;
     }
     game.getFinalWhiteScore = getFinalWhiteScore;
     function getFinalBlackScore() {

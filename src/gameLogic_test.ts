@@ -150,7 +150,7 @@ describe("In Go", function() {
                         [-1, -1, -1, -1, -1],
                         [-1, -1, -1, -1, -1],];
         expectMove(OK, WHITE, boardBefore, stateBeforeMove, -1, -1, boardAfter, true,
-            [{row:0,col:1}, {row:1,col:0}], [{row:1,col:1},{row:2,col:1}], 4, 8, -1, [2,9.5], boardBefore);
+            [{row:0,col:1}, {row:1,col:0}], [{row:1,col:1},{row:2,col:1}], 4, 8, -1, [2,3], boardBefore);
     });
     
   it("Trapping BLACK stones work 2", function() {
