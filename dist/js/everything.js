@@ -435,6 +435,7 @@ var game;
     game.state = null;
     game.isHelpModalShown = false;
     game.boardSize = 13;
+    game.boardSizeSet = false;
     game.KOMI = 6.5;
     (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
     function init() {
@@ -616,6 +617,10 @@ var game;
         }
     }
     game.getTurn = getTurn;
+    function isBoardSizeSet() {
+        return game.boardSizeSet;
+    }
+    game.isBoardSizeSet = isBoardSizeSet;
     function setBoardSize(num) {
         if (num !== 13 && num !== 19 && num !== 9) {
             throw Error("Invalid board size");
@@ -624,9 +629,8 @@ var game;
         gameLogic.COLS = num;
         game.state = gameLogic.getInitialState();
         game.boardSize = num;
-        document.getElementById("boardSize").style.display = "none";
-        document.getElementById("container").style.display = "block";
         game.KOMI = (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
+        game.boardSizeSet = true;
         return;
     }
     game.setBoardSize = setBoardSize;
