@@ -11,7 +11,8 @@ var game;
     game.state = null;
     game.isHelpModalShown = false;
     game.boardSize = 13;
-    game.KOMI = (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
+    game.KOMI = 6.5;
+    (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
     function init() {
         translate.setTranslations(getTranslations());
         translate.setLanguage('en');
@@ -201,6 +202,7 @@ var game;
         game.boardSize = num;
         document.getElementById("boardSize").style.display = "none";
         document.getElementById("container").style.display = "block";
+        game.KOMI = (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
         return;
     }
     game.setBoardSize = setBoardSize;

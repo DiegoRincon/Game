@@ -14,7 +14,7 @@ module game {
   export let state: IState = null;
   export let isHelpModalShown: boolean = false;
   export let boardSize = 13;
-  export const KOMI = (boardSize === 19) ? 6.5 : (boardSize === 13) ? 7.5 : 8.5;
+  export let KOMI = 6.5;(boardSize === 19) ? 6.5 : (boardSize === 13) ? 7.5 : 8.5;
 
   export function init() {
     translate.setTranslations(getTranslations());
@@ -211,6 +211,7 @@ module game {
       boardSize = num;
       document.getElementById("boardSize").style.display = "none";
       document.getElementById("container").style.display = "block";
+      KOMI = (boardSize === 19) ? 6.5 : (boardSize === 13) ? 7.5 : 8.5;
       return
   }
     
