@@ -15,6 +15,7 @@ module game {
   export let isHelpModalShown: boolean = false;
   export let boardSize = 13;
   export let boardSizeSet = false;
+  export let hasKomi:boolean = false;
   export let KOMI = 6.5;(boardSize === 19) ? 6.5 : (boardSize === 13) ? 7.5 : 8.5;
 
   export function init() {
@@ -69,7 +70,7 @@ module game {
   }
   
   export function getFinalWhiteScore(): number {
-      return move.endMatchScores[gameLogic.WHITE] + KOMI;
+      return move.endMatchScores[gameLogic.WHITE] + ((hasKomi) ? KOMI : 0);
   }
   
   export function getFinalBlackScore(): number {

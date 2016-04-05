@@ -12,6 +12,7 @@ var game;
     game.isHelpModalShown = false;
     game.boardSize = 13;
     game.boardSizeSet = false;
+    game.hasKomi = false;
     game.KOMI = 6.5;
     (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
     function init() {
@@ -64,7 +65,7 @@ var game;
     }
     game.isGameOver = isGameOver;
     function getFinalWhiteScore() {
-        return game.move.endMatchScores[gameLogic.WHITE] + game.KOMI;
+        return game.move.endMatchScores[gameLogic.WHITE] + ((game.hasKomi) ? game.KOMI : 0);
     }
     game.getFinalWhiteScore = getFinalWhiteScore;
     function getFinalBlackScore() {
