@@ -357,22 +357,24 @@ var gameLogic;
         return true;
     }
     function stonesHaveExit(stones, board) {
-        for (var i = 0; i < stones.length; i++) {
-            var stone = stones[i];
+        for (var s = 0; s < stones.length; s++) {
+            var stone = stones[s];
             var x = stone.row;
             var y = stone.col;
-            for (var i_1 = -1; i_1 < 2; i_1++) {
+            for (var i = -1; i < 2; i++) {
                 for (var j = -1; j < 2; j++) {
-                    if (Math.abs(i_1) === Math.abs(j)) {
+                    if (Math.abs(i) === Math.abs(j)) {
                         continue;
                     }
-                    if (x + i_1 < 0 || x + j < 0) {
+                    var r = x + i;
+                    var c = y + j;
+                    if (r < 0 || c < 0) {
                         continue;
                     }
-                    if (x + i_1 >= gameLogic.ROWS || y + j >= gameLogic.COLS) {
+                    if (r >= gameLogic.ROWS || c >= gameLogic.COLS) {
                         continue;
                     }
-                    if (board[x + i_1][y + j] === -1) {
+                    if (board[r][c] === -1) {
                         return true;
                     }
                 }

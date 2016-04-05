@@ -399,8 +399,8 @@ module gameLogic {
   }
   
   function stonesHaveExit(stones: Stone[], board: Board): boolean {
-      for (let i = 0; i < stones.length; i++) {
-          let stone = stones[i];
+      for (let s = 0; s < stones.length; s++) {
+          let stone = stones[s];
           let x = stone.row;
           let y = stone.col;
           for (let i = -1; i < 2; i++) {
@@ -408,13 +408,15 @@ module gameLogic {
                   if (Math.abs(i) === Math.abs(j)) {
                       continue;
                   }
-                  if (x + i < 0 || x + j < 0) {
+                  let r = x+i;
+                  let c = y+j;
+                  if (r < 0 || c < 0) {
                       continue;
                   }
-                  if (x + i >= ROWS || y + j >= COLS) {
+                  if (r >= ROWS || c >= COLS) {
                       continue;
                   }
-                  if (board[x + i][y + j] === -1) {
+                  if (board[r][c] === -1) {
                       return true;
                   }
               }
