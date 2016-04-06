@@ -85,7 +85,7 @@ module.exports = function(grunt) {
         ' -format bmp ' + output_directory + '/temp/' + dimensions + '.bmp');
     commands.push('convert ' + output_directory +
       '/temp/' + dimensions + '.bmp -format png -background transparent -gravity center -extent '
-      + height + 'x' + width + ' ' + output_directory + '/' + desired_size + ".png");
+      + width + 'x' + height + ' ' + output_directory + '/' + desired_size + ".png");
   }
   commands.push('rm -rf ' + output_directory + '/temp');
   var auto_resize_images_command = commands.join(" && ");
