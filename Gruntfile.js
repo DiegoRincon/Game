@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   // into multiple sizes for Google&Apple app submission.
   // I use 'sips' command line to resize and pad images,
   // which only work on MAC OSx.
-  var src_img = "src.png";
+  var src_img = "go.png";
   var src_img_width_to_height_ratio = 1024/1024;
   var directory = "auto_resize_images";
   var output_directory = directory + "/output";
@@ -80,13 +80,12 @@ module.exports = function(grunt) {
     var is_height_limiting = width / src_img_width_to_height_ratio > height;
     var scale_to_width = is_height_limiting ? height * src_img_width_to_height_ratio : width;
     var scale_to_height = is_height_limiting ? height : width / src_img_width_to_height_ratio;
-    commands.push('sips ' + directory + '/' + src_img + ' --resampleHeightWidth ' +
-        scale_to_height + ' ' + scale_to_width +
-        ' -s format bmp --out ' + output_directory + '/temp/' + dimensions + '.bmp');
-    commands.push('sips ' + output_directory +
-      '/temp/' + dimensions + '.bmp -s format png --padToHeightWidth ' +
-      height + ' ' + width +
-      ' --padColor ' + padColor + ' --out ' + output_directory + '/' + desired_size + ".png");
+    commands.push('convert ' + directory + '/' + src_img + ' -scale ' +
+        scale_to_height + 'x' + scale_to_width +
+        ' -format bmp ' + output_directory + '/temp/' + dimensions + '.bmp');
+    commands.push('convert ' + output_directory +
+      '/temp/' + dimensions + '.bmp -format png -background transparent -gravity center -extent '
+      + height + 'x' + width + ' ' + output_directory + '/' + desired_size + ".png");
   }
   commands.push('rm -rf ' + output_directory + '/temp');
   var auto_resize_images_command = commands.join(" && ");
