@@ -14,7 +14,7 @@ module game {
   export let state: IState = null;
   export let isHelpModalShown: boolean = false;
   export let boardSize = 13;
-  export let boardSizeSet = false;
+  export let boardSizeSet = true;
   export let hasKomi:boolean = false;
   export let KOMI = 6.5;
 

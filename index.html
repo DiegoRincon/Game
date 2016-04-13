@@ -121,7 +121,7 @@
     </div>
   </div>
 <div id="pass">
-    <input id="resign" type="button" value="Resign" ng-click="game.resign(game.getTurn())" />
+    <!-- <input id="resign" type="button" value="Resign" ng-click="game.resign(game.getTurn())" /> -->
     <input id="passB" type="button" value="Pass" ng-click="game.cellClicked(-1,-1)" />
     <p ng-if="game.isGameOver()" style="color:red">This game has ended. Scores: white: {{ game.getFinalWhiteScore() }} black: {{ game.getFinalBlackScore() }}</p>
 </div>

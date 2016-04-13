@@ -437,7 +437,7 @@ var game;
     game.state = null;
     game.isHelpModalShown = false;
     game.boardSize = 13;
-    game.boardSizeSet = false;
+    game.boardSizeSet = true;
     game.hasKomi = false;
     game.KOMI = 6.5;
     function init() {
