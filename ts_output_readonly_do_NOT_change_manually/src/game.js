@@ -150,6 +150,10 @@ var game;
             if (!game.state.delta) {
                 sendComputerMove();
             }
+            //If player passed
+            if (game.state.delta.col == -1 && game.state.delta.row == -1) {
+                sendComputerMove();
+            }
         }
     }
     function getNumber(num) {

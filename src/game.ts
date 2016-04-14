@@ -159,6 +159,10 @@ module game {
       if (!state.delta) {
           sendComputerMove();
       }
+      //If player passed
+      if (state.delta.col == -1 && state.delta.row == -1) {
+          sendComputerMove();
+      }
       //sendComputerMove();
     }
   }
