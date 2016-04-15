@@ -208,7 +208,7 @@ var game;
         gameLogic.ROWS = num;
         gameLogic.COLS = num;
         game.state = gameLogic.getInitialState();
-        game.boardSize = num;
+        //   boardSize = num;
         game.KOMI = (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
         game.boardSizeSet = true;
         return;
