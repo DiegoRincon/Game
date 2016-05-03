@@ -184,8 +184,8 @@ var game;
     }
     game.cellClicked = cellClicked;
     function shouldShowImage(row, col) {
-        if (!game.state.board) {
-            return false;
+        if (!game.state) {
+            game.state = gameLogic.getInitialState();
         }
         var cell = game.state.board[row][col];
         return cell !== -1;

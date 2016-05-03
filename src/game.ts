@@ -195,8 +195,8 @@ module game {
   }
 
   export function shouldShowImage(row: number, col: number): boolean {
-    if (!state.board) {
-      return false;
+    if (!state) {
+      state = gameLogic.getInitialState();
     }
     let cell = state.board[row][col];
     return cell !== -1;
