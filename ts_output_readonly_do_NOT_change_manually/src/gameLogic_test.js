@@ -3,8 +3,8 @@ describe("In Go", function () {
     var ILLEGAL = false;
     var WHITE = gameLogic.WHITE;
     var BLACK = gameLogic.BLACK;
-    gameLogic.ROWS = 5;
-    gameLogic.COLS = 5;
+    //   gameLogic.ROWS = 5;
+    //   gameLogic.COLS = 5;
     var NO_ONE_TURN = -1;
     var NO_ONE_WINS = null;
     it("placing BLACK in 0x0 from initial state is legal", function () {

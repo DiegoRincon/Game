@@ -13,7 +13,7 @@ module game {
   export let move: IMove = null;
   export let state: IState = null;
   export let isHelpModalShown: boolean = false;
-  export const boardSize = 13;
+  export const boardSize = gameLogic.ROWS;
   //export let boardSizeSet = true;
   export let hasKomi:boolean = false;
   export let KOMI = 6.5;

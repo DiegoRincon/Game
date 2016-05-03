@@ -10,7 +10,7 @@ var game;
     game.move = null;
     game.state = null;
     game.isHelpModalShown = false;
-    game.boardSize = 13;
+    game.boardSize = gameLogic.ROWS;
     //export let boardSizeSet = true;
     game.hasKomi = false;
     game.KOMI = 6.5;

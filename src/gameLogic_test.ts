@@ -3,8 +3,8 @@ describe("In Go", function() {
   let ILLEGAL = false;
   let WHITE = gameLogic.WHITE;
   let BLACK = gameLogic.BLACK;
-  gameLogic.ROWS = 5;
-  gameLogic.COLS = 5;
+//   gameLogic.ROWS = 5;
+//   gameLogic.COLS = 5;
   let NO_ONE_TURN = -1;
   let NO_ONE_WINS: number[] = null;
 

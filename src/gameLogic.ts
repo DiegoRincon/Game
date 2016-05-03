@@ -22,8 +22,8 @@ interface IState {
 
 module gameLogic {
   //TODO: Allow players to determine cells.
-  export let ROWS : number = 13;
-  export let COLS : number = 13;
+  export const ROWS : number = 13;
+  export const COLS : number = 13;
   export const BLACK = 0;
   export const WHITE = 1;
   export const BLACKTERR = 2;
