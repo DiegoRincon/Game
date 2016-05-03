@@ -14,7 +14,7 @@ module game {
   export let state: IState = null;
   export let isHelpModalShown: boolean = false;
   export const boardSize = 13;
-  export let boardSizeSet = true;
+  //export let boardSizeSet = true;
   export let hasKomi:boolean = false;
   export let KOMI = 6.5;
 
@@ -206,24 +206,7 @@ module game {
           return "White";
       }
   }
-  
-  export function isBoardSizeSet() {
-      return boardSizeSet;
-  }
-  
-  export function setBoardSize(num: number): void {
-      if (num !== 13 && num !== 19 && num !== 9) {
-          throw Error("Invalid board size");
-      }
-      gameLogic.ROWS = num;
-      gameLogic.COLS = num;
-      state = gameLogic.getInitialState();
-    //   boardSize = num;
-      KOMI = (boardSize === 19) ? 6.5 : (boardSize === 13) ? 7.5 : 8.5;
-      boardSizeSet = true;
-      return
-  }
-    
+       
   export function resign(player : string): void {
     // if row == -1 and col == 0 then black resigned
     // if row == 0 and col == -1 then white resigned

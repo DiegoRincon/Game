@@ -103,12 +103,7 @@
     <p ng-if="game.isGameOver()" style="color:red">This game has ended. Scores: white: {{ game.getFinalWhiteScore() }} black: {{ game.getFinalBlackScore() }}</p>
 </div>
 <div id="gameArea">
-  <div id="boardSize" ng-if="!game.isBoardSizeSet()">
-          <input id="9x9" type="submit" value="Play 9x9" ng-click="game.setBoardSize(9)" />
-          <input id="13x13" type="submit" value="Play 13x13" ng-click="game.setBoardSize(13)" />
-          <input id="19x19" type="submit" value="Play 19x19" ng-click="game.setBoardSize(19)" />
-  </div>
-  <div id="container" class="{{'container'+game.boardSize}}" ng-if="game.isBoardSizeSet()">
+  <div id="container" class="{{'container'+game.boardSize}}">
     <div ng-repeat="row in game.getNumber(game.boardSize) track by $index"
     style="position:absolute; top:{{row*100/game.boardSize | number:5}}%; left:0;
     width:{{100/game.boardSize | number:5}}%; height:{{100/game.boardSize | number:5}}%;" >

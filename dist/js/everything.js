@@ -437,7 +437,7 @@ var game;
     game.state = null;
     game.isHelpModalShown = false;
     game.boardSize = 13;
-    game.boardSizeSet = true;
+    //export let boardSizeSet = true;
     game.hasKomi = false;
     game.KOMI = 6.5;
     function init() {
@@ -623,23 +623,6 @@ var game;
         }
     }
     game.getTurn = getTurn;
-    function isBoardSizeSet() {
-        return game.boardSizeSet;
-    }
-    game.isBoardSizeSet = isBoardSizeSet;
-    function setBoardSize(num) {
-        if (num !== 13 && num !== 19 && num !== 9) {
-            throw Error("Invalid board size");
-        }
-        gameLogic.ROWS = num;
-        gameLogic.COLS = num;
-        game.state = gameLogic.getInitialState();
-        //   boardSize = num;
-        game.KOMI = (game.boardSize === 19) ? 6.5 : (game.boardSize === 13) ? 7.5 : 8.5;
-        game.boardSizeSet = true;
-        return;
-    }
-    game.setBoardSize = setBoardSize;
     function resign(player) {
         // if row == -1 and col == 0 then black resigned
         // if row == 0 and col == -1 then white resigned
