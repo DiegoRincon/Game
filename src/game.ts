@@ -96,8 +96,8 @@ module game {
         es: "Ninguna piedra puede ser jugada de tal manera que repita un previo tablero. Cuando los dos jugadores pasan su turno el juego termina.",
       },
       RULES_SLIDE4: {
-        en: "A player's territory consists of all the points the player has either occupied or surrounded. The player with more territory wins the game. If Komi option is selected, White will be awarded bonus points (6.5 for 19x19; 7.5 for 13x13; and 8.5 for 9x9))",
-        es: "El territorio de un jugador consiste en todos los puntos que esten ocupados o rodeados. El jugador con más territorio gana el juego. Si la opcion Komi es elegida, Blanco obtendra un bono de puntos (6.5 para 19x19; 7.5 para 13x13; 8.5 para 9x9))",          
+        en: "A player's territory consists of all the points the player has either occupied or surrounded. The player with more territory wins the game.",
+        es: "El territorio de un jugador consiste en todos los puntos que esten ocupados o rodeados. El jugador con más territorio gana el juego.",
       },
       CLOSE:  {
         en: "Close",
@@ -195,6 +195,9 @@ module game {
   }
 
   export function shouldShowImage(row: number, col: number): boolean {
+    if (!state.board) {
+      return false;
+    }
     let cell = state.board[row][col];
     return cell !== -1;
   }
